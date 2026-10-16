@@ -9,5 +9,10 @@ import iscot.message.Message;
 
 public class Broker {
 	private Map<Type,List<Message>> messages =new HashMap<Type, List<Message>>();
+
+	public void queueMessage(Message message) {
+		messages.get(message.)
+		
+	}
 	
 }

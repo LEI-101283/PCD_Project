@@ -7,12 +7,13 @@ import iscot.server.DealWithClient;
 
 public class Area {
 	public final String name;
-	public final int id;
-	private List<DealWithClient> subscriptions= new ArrayList<>();
-	public Area(String name, int id) {
+	private List<DealWithClient> clients= new ArrayList<>();
+	public Area(String name) {
 		super();
 		this.name = name;
-		this.id = id;
+	}
+	public List<DealWithClient> getClients() {
+		return clients;
 	}
 	
 }

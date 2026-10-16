@@ -7,4 +7,10 @@ public class LightSensorMessage extends SensorMessage {
 		super(area);
 		this.light = light;
 	}
+
+	@Override
+	public String toString() {
+		return "LightSensorMessage [light=" + light + ", " + super.toString() + "]";
+	}
+	
 }

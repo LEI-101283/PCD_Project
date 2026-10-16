@@ -1,0 +1,34 @@
+package iscot.server;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
+import iscot.message.RegistrationMessage;
+import iscot.message.sensor.LightSensorMessage;
+
+public class DealWithSensor extends DealWithClient{
+
+	public DealWithSensor(ObjectInputStream in, ObjectOutputStream out, Server server, String area, int id) {
+		super(in,out,server,area,id);
+	}
+
+	@Override
+	public void run() {
+		while(true) {
+			try {
+				LightSensorMessage lightSensorMessage=(LightSensorMessage)in.readObject();
+				
+				System.err.println("Got lighting message:"+lightSensorMessage);
+				server.queueMessage(lightSensorMessage);
+			} catch (ClassNotFoundException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+	}
+
+}
