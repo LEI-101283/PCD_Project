@@ -37,8 +37,14 @@ public class Server {
 	}
 
 	private void startServing() {
-		// TODO Auto-generated method stub
-		
+		while(true)
+			try {
+				new DealWithClient(serverSocket.accept()).start();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("Connection failed!");
+				e.printStackTrace();
+			}
 	}
 
 }

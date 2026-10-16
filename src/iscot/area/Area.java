@@ -1,6 +1,7 @@
 package iscot.area;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import iscot.server.DealWithClient;
 
