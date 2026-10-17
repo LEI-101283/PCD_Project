@@ -9,11 +9,12 @@ import java.util.Map;
 
 import iscot.area.Area;
 import iscot.broker.Broker;
+import iscot.enums.Type;
 import iscot.message.Message;
 import iscot.message.sensor.LightSensorMessage;
 
 public class Server {
-	private Broker broker= new Broker();
+	private Broker broker= new Broker(this);
 	private ServerSocket serverSocket;
 	private Map<String,Area> areas= new HashMap<>();
 
@@ -75,6 +76,16 @@ public class Server {
 	public void queueMessage(Message message) {
 		broker.queueMessage(message);
 		
+	}
+
+	public int countClientsFor(Type type, String area) {
+		int count=0;
+		for(DealWithClient client:areas.get(area).getClients())
+			if(client.getType()==Type.DECIDER && type==Type.SENSOR)
+				count++;
+			else if(client.getType()==Type.ACTUATOR && type==Type.DECIDER)
+				count++;
+		return count;
 	}
 
 }
