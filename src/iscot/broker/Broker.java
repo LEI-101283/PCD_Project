@@ -1,5 +1,6 @@
 package iscot.broker;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +16,9 @@ public class Broker {
 	private Map<Message,CountDownLatch> cdls=new HashMap<Message,CountDownLatch>();
 	private Server server;
 	public Broker(Server server) {
-		super();
 		this.server = server;
+		for(Type type:Type.values())
+			messages.put(type, new ArrayList<Message>());
 	}
 
 	public synchronized void queueMessage(Message message) {

@@ -30,7 +30,7 @@ public class Server {
 	 *  - list of String, with names of all existing areas
 	 */
 	public static void main(String[] args) throws IOException {
-		if(args.length <3 ||  args.length % 2 == 0) {
+		if(args.length <3) {
 			System.err.println("Invalid arguments!");
 		}
 		else {
@@ -58,7 +58,12 @@ public class Server {
 			throw new IllegalArgumentException("Sensor already registered!");
 		if(!areaExists(dealWithClient.getArea()))
 			throw new IllegalArgumentException("Invalid Area!");
-		areas.get(dealWithClient.getArea()).getClients().add(dealWithClient);
+		// if all areas...
+		if(dealWithClient.getArea().equals("all"))
+			for(String areaName:areas.keySet())
+				areas.get(areaName).getClients().add(dealWithClient);
+		else
+			areas.get(dealWithClient.getArea()).getClients().add(dealWithClient);
 		
 	}
 
