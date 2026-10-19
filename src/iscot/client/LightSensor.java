@@ -11,7 +11,7 @@ import iscot.message.RegistrationMessage;
 import iscot.message.sensor.LightSensorMessage;
 import iscot.message.sensor.TemperatureSensorMessage;
 
-public class LightingSensor {
+public class LightSensor {
 
 	/**
 	 * 

@@ -255,15 +255,21 @@ public class SystemMonitor extends JFrame {
 			String area=args[2];
 			out.writeObject(new RegistrationMessage("All", iscot.enums.Type.DECIDER ,Integer.parseInt(args[2])));
 
-
+			SystemMonitor gui=new SystemMonitor();;
 			SwingUtilities.invokeLater(() -> {
-				SystemMonitor gui = new SystemMonitor();
 				gui.setVisible(true);
 			});
 
 			while(true) {
 				Message message=(Message)in.readObject();
 				System.err.println("Monitor got:"+message);
+				gui.log(message.toString());
+				if(message instanceof LightSensorMessage) {
+					LightSensorMessage lightSensorMessage=(LightSensorMessage)message;
+					switch(lightSensorMessage.area) {
+					case "WC":
+					}
+				}
 			}
 		}
 	}
