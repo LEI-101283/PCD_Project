@@ -8,6 +8,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
 import iscot.area.Area;
+import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.Message;
 import iscot.server.Server;
@@ -39,6 +40,7 @@ public class Broker {
 			}
 		}).start();
 		notifyAll();
+//		System.err.println("Broker: message queued!");
 	}
 	
 	protected synchronized void removeMessage(Message message) {
@@ -46,17 +48,16 @@ public class Broker {
 		notifyAll();
 	}
 
-	public synchronized Message getMessage(Type type, String area) throws InterruptedException {
-		while(messages.isEmpty() || noMessageFor(type,area))
+	public synchronized Message getMessage(Type type, Areas area) throws InterruptedException {
+		while(messages.isEmpty() || noMessageFor(type,area)) {
+			System.err.println(" Wait in getMessage!:"+messages+ "Asked for:"+type+area);
 			wait();
-	
-		return messages.get(area).get(0);
+		}
+		return messages.get(type).get(0);
 	}
 
-	private boolean noMessageFor(Type type, String area) {
-		System.err.println("Checking messages for:"+area);
-		if(area.equals("ALL"))
-			return messages.isEmpty();
-		return !messages.get(area).isEmpty() && messages.get(area).get(0).getType()==type;
+	private boolean noMessageFor(Type type, Areas area) {
+//		System.err.println("Checking messages for:"+area+" Type:"+type);
+		return messages.get(type).isEmpty() ||  messages.get(type).get(0).area!=area;
 	}
 }

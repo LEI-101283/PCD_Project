@@ -24,7 +24,7 @@ public class LightSensor {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException, InterruptedException {
-		if(args.length!=4) {
+		if(args.length!=3) {
 			System.err.println("Invalid arguments!");
 		}
 		else {
@@ -34,7 +34,7 @@ public class LightSensor {
 
 			// register with the server
 			String area=args[2];
-			out.writeObject(new RegistrationMessage(area, Type.SENSOR,Integer.parseInt(args[3])));
+			out.writeObject(new RegistrationMessage(area, Type.SENSOR));
 
 			while(true) {
 				out.writeObject(new LightSensorMessage(area,(float)(17+Math.random()*6)));

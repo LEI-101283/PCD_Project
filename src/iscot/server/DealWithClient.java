@@ -5,36 +5,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.RegistrationMessage;
 
-public class DealWithClient extends Thread{
-	protected ObjectInputStream in;
-	private ObjectOutputStream out;
-	protected Server server;
-	private String area;
-	public String getArea() {
-		return area;
-	}
-	public int getClientId() {
-		return id;
-	}
-	private int id=-1;
-	public DealWithClient(Socket accept,Server server) throws IOException {
-		this.server=server;
-		in=new ObjectInputStream(accept.getInputStream());
-		out=new ObjectOutputStream(accept.getOutputStream());
-	}
-	public DealWithClient(ObjectInputStream in, ObjectOutputStream out,Server server, String area, int id) {
+public class DealWithClient extends Client{
+	public DealWithClient(Server server, Areas area, ObjectInputStream in, ObjectOutputStream out) {
+		super(server, area);
+		
 		this.in=in;
 		this.out=out;
-		this.server=server;
-		this.area=area;
-		this.id=id;
 	}
-	public Type getType() {
-		return Type.DWC;
-	}
+	protected ObjectInputStream in;
+	private ObjectOutputStream out;
+	
+	
 	@Override
 	public void run() {
 		// get registration
@@ -43,12 +28,12 @@ public class DealWithClient extends Thread{
 			
 			switch (registrationMessage.type) {
 			case SENSOR:
-					DealWithSensor dealWithSensor=new DealWithSensor(in, out,server,registrationMessage.area,registrationMessage.id);
+					DealWithSensor dealWithSensor=new DealWithSensor(in, out,server,registrationMessage.area);
 					server.register(dealWithSensor);
 					dealWithSensor.start();
 				break;
 			case DECIDER:
-				DealWithDecider dealWithDecider=new DealWithDecider(in, out,server,registrationMessage.area,registrationMessage.id);
+				DealWithDecider dealWithDecider=new DealWithDecider(in, out,server,registrationMessage.area);
 				server.register(dealWithDecider);
 				dealWithDecider.start();
 			default:
@@ -58,6 +43,12 @@ public class DealWithClient extends Thread{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+
+	@Override
+	public Type getType() {
+		return Type.DWC;
 	}
 
 }

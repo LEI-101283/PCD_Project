@@ -1,7 +1,10 @@
 package iscot.server;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,14 +12,17 @@ import java.util.Map;
 
 import iscot.area.Area;
 import iscot.broker.Broker;
+import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.Message;
 import iscot.message.sensor.LightSensorMessage;
+import iscot.monitor.SystemMonitor;
+import iscot.monitor.SystemMonitor.WcThread;
 
 public class Server {
 	private Broker broker= new Broker(this);
 	private ServerSocket serverSocket;
-	private Map<String,Area> areas= new HashMap<>();
+	private Map<Areas,Area> areas= new HashMap<>();
 
 	public Server(int portNumber, List<Area> areas) throws IOException {
 		serverSocket= new ServerSocket(portNumber);
@@ -27,25 +33,29 @@ public class Server {
 	/* Server that manages the broker.
 	 * @params
 	 *  - int portNumber: for connection requests
-	 *  - list of String, with names of all existing areas
 	 */
 	public static void main(String[] args) throws IOException {
-		if(args.length <3) {
+		if(args.length !=1) {
 			System.err.println("Invalid arguments!");
 		}
 		else {
 			int portNumber= Integer.parseInt(args[0]);
-			List<Area> areas=new ArrayList<Area>((args.length-1)/2);
-			for(int i=1; i!=args.length;i++)
-				areas.add(new Area(args[i]));
-			new Server(portNumber,areas).startServing();	
+			List<Area> areas=new ArrayList<Area>(Areas.values().length);
+			for(int i=1; i!=Areas.values().length;i++)
+				areas.add(new Area(Areas.values()[i]));
+			System.err.println("Existing areas:"+areas.size());
+			Server server= new Server(portNumber,areas);
+			new SystemMonitor(server);
+			server.startServing();	
+			
 		}
 	}
 
 	private void startServing() {
 		while(true)
 			try {
-				new DealWithClient(serverSocket.accept(),this).start();
+				Socket socket=serverSocket.accept();
+				new DealWithClient(this, null,new ObjectInputStream(socket.getInputStream()),new ObjectOutputStream(socket.getOutputStream()) ).start();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				System.err.println("Connection failed!");
@@ -53,29 +63,25 @@ public class Server {
 			}
 	}
 
-	public void register(DealWithClient dealWithClient) {
-		if(!areaExists(dealWithClient.getArea()) && !dealWithClient.getArea().equals("ALL"))
-			throw new IllegalArgumentException("Invalid Area!");
-		if(isAlreadyRegistered(dealWithClient))
+	public void register(Client client) {
+		if(!areaExists(client.getArea()) )
+			throw new IllegalArgumentException("Invalid Area:"+client.getArea());
+		if(isAlreadyRegistered(client))
 			throw new IllegalArgumentException("Sensor already registered!");
-		// if all areas...
-		if(dealWithClient.getArea().equals("ALL"))
-			for(String areaName:areas.keySet())
-				areas.get(areaName).getClients().add(dealWithClient);
-		else
-			areas.get(dealWithClient.getArea()).getClients().add(dealWithClient);
+		
+		areas.get(client.getArea()).getClients().add(client);
 		
 	}
 
-	private boolean areaExists(String area) {
-		return areas.containsKey(area);
+	private boolean areaExists(Areas areas2) {
+		return areas.containsKey(areas2);
 	}
 
-	private boolean isAlreadyRegistered(DealWithClient dealWithClient) {
-		if(areas.get(dealWithClient.getArea())==null || areas.get(dealWithClient.getArea()).getClients().isEmpty())
+	private boolean isAlreadyRegistered(Client client2) {
+		if(areas.get(client2.getArea())==null || areas.get(client2.getArea()).getClients().isEmpty())
 			return false;
-		for(DealWithClient client:areas.get(dealWithClient.getArea()).getClients())
-			if(client.getClientId()==dealWithClient.getClientId())
+		for(Client client:areas.get(client2.getArea()).getClients())
+			if(client.getClientId()==client2.getClientId())
 				return true;
 		return false;
 	}
@@ -84,19 +90,13 @@ public class Server {
 		broker.queueMessage(message);
 	}
 	
-	public List<Message> getMessages(Type type, String area) throws InterruptedException {
-		List<Message> messages = new ArrayList<>();
-		if(area.equals("ALL")) // Messages in all areas
-			for(String area2:areas.keySet())
-				messages.add(broker.getMessage(type, area2));
-		else
-			broker.getMessage(type, area); // single message in requested area
-		return messages;
+	public Message getMessage(Type type, Areas areas2) throws InterruptedException {
+		return 	broker.getMessage(type, areas2); // single message in requested area
 	}
 
-	public int countClientsFor(Type type, String area) {
+	public int countClientsFor(Type type, Areas area) {
 		int count=0;
-		for(DealWithClient client:areas.get(area).getClients())
+		for(Client client:areas.get(area).getClients())
 			if(client.getType()==Type.DECIDER && type==Type.SENSOR)
 				count++;
 			else if(client.getType()==Type.ACTUATOR && type==Type.DECIDER)
