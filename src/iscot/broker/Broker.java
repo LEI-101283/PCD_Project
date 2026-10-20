@@ -48,10 +48,10 @@ public class Broker {
 	public synchronized Message getMessage(Type type, String area) throws InterruptedException {
 		while(messages.isEmpty() || noMessageFor(type,area))
 			wait();
-		return messages.get(area).getFirst();
+		return messages.get(area).get(0);
 	}
 
 	private boolean noMessageFor(Type type, String area) {
-		return !messages.get(area).isEmpty() && messages.get(area).getFirst().getType()==type;
+		return !messages.get(area).isEmpty() && messages.get(area).get(0).getType()==type;
 	}
 }
