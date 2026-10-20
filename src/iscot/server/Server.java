@@ -54,12 +54,12 @@ public class Server {
 	}
 
 	public void register(DealWithClient dealWithClient) {
+		if(!areaExists(dealWithClient.getArea()) && !dealWithClient.getArea().equals("ALL"))
+			throw new IllegalArgumentException("Invalid Area!");
 		if(isAlreadyRegistered(dealWithClient))
 			throw new IllegalArgumentException("Sensor already registered!");
-		if(!areaExists(dealWithClient.getArea()))
-			throw new IllegalArgumentException("Invalid Area!");
 		// if all areas...
-		if(dealWithClient.getArea().equals("all"))
+		if(dealWithClient.getArea().equals("ALL"))
 			for(String areaName:areas.keySet())
 				areas.get(areaName).getClients().add(dealWithClient);
 		else
@@ -72,6 +72,8 @@ public class Server {
 	}
 
 	private boolean isAlreadyRegistered(DealWithClient dealWithClient) {
+		if(areas.get(dealWithClient.getArea())==null || areas.get(dealWithClient.getArea()).getClients().isEmpty())
+			return false;
 		for(DealWithClient client:areas.get(dealWithClient.getArea()).getClients())
 			if(client.getClientId()==dealWithClient.getClientId())
 				return true;
@@ -80,7 +82,16 @@ public class Server {
 
 	public void queueMessage(Message message) {
 		broker.queueMessage(message);
-		
+	}
+	
+	public List<Message> getMessages(Type type, String area) throws InterruptedException {
+		List<Message> messages = new ArrayList<>();
+		if(area.equals("ALL")) // Messages in all areas
+			for(String area2:areas.keySet())
+				messages.add(broker.getMessage(type, area2));
+		else
+			broker.getMessage(type, area); // single message in requested area
+		return messages;
 	}
 
 	public int countClientsFor(Type type, String area) {

@@ -33,7 +33,7 @@ public class DealWithClient extends Thread{
 		this.id=id;
 	}
 	public Type getType() {
-		return Type.SENSOR;
+		return Type.DWC;
 	}
 	@Override
 	public void run() {
@@ -47,7 +47,10 @@ public class DealWithClient extends Thread{
 					server.register(dealWithSensor);
 					dealWithSensor.start();
 				break;
-
+			case DECIDER:
+				DealWithDecider dealWithDecider=new DealWithDecider(in, out,server,registrationMessage.area,registrationMessage.id);
+				server.register(dealWithDecider);
+				dealWithDecider.start();
 			default:
 				break;
 			}

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
+import iscot.area.Area;
 import iscot.enums.Type;
 import iscot.message.Message;
 import iscot.server.Server;
@@ -48,10 +49,14 @@ public class Broker {
 	public synchronized Message getMessage(Type type, String area) throws InterruptedException {
 		while(messages.isEmpty() || noMessageFor(type,area))
 			wait();
+	
 		return messages.get(area).get(0);
 	}
 
 	private boolean noMessageFor(Type type, String area) {
+		System.err.println("Checking messages for:"+area);
+		if(area.equals("ALL"))
+			return messages.isEmpty();
 		return !messages.get(area).isEmpty() && messages.get(area).get(0).getType()==type;
 	}
 }

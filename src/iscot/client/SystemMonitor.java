@@ -43,6 +43,9 @@ public class SystemMonitor extends JFrame {
 
 	private final JList<String> debugList =
 			new JList<>(debugListModel);
+	
+	private final Map<String, DefaultListModel<String>> clientesPorArea =
+	        new LinkedHashMap<>();
 
 	private int nextLogId = 0;
 	public SystemMonitor() {
@@ -61,7 +64,7 @@ public class SystemMonitor extends JFrame {
 		casa.add(criarDivisao("Quarto", true));
 		casa.add(criarJardim());
 
-		casa.add(crianDebug());
+		casa.add(criarDebug());
 		// DEBUG
 		log(getTitle());
 		
@@ -94,8 +97,34 @@ public class SystemMonitor extends JFrame {
 		painel.add(new JLabel(texto));
 	}
 
+	private void criarListaClientes(JPanel painel, String area) {
+	    painel.add(new JLabel("Clientes inscritos:"));
+
+	    DefaultListModel<String> modelo = new DefaultListModel<>();
+	    clientesPorArea.put(area, modelo);
+
+	    JList<String> lista = new JList<>(modelo);
+	    lista.setVisibleRowCount(3);
+
+	    painel.add(new JScrollPane(lista));
+	}
+	
+	public void adicionarCliente(String area, String cliente) {
+	    SwingUtilities.invokeLater(() -> {
+	        DefaultListModel<String> modelo = clientesPorArea.get(area);
+
+	        if (modelo == null) {
+	            throw new IllegalArgumentException(
+	                "Área desconhecida: " + area
+	            );
+	        }
+
+	        modelo.addElement(cliente);
+	    });
+	}
+	
 	// DEBUG
-	public JPanel crianDebug() {
+	public JPanel criarDebug() {
 		JPanel debugPanel = new JPanel(new BorderLayout());
 
 		debugPanel.setBorder(
@@ -165,7 +194,9 @@ public class SystemMonitor extends JFrame {
 
 		estore.addChangeListener(e ->
 		posicao.setText("Estore: " + estore.getValue() + "%"));
-
+		
+		criarListaClientes(painel, "Cozinha");
+		
 		return painel;
 	}
 
@@ -178,6 +209,8 @@ public class SystemMonitor extends JFrame {
 		JCheckBox ventilacao = new JCheckBox("Ventilação ligada");
 		painel.add(ventilacao);
 
+		criarListaClientes(painel, "WC");
+		
 		return painel;
 	}
 
@@ -207,6 +240,8 @@ public class SystemMonitor extends JFrame {
 			painel.add(modoAC);
 		}
 
+		criarListaClientes(painel, nome);
+		
 		return painel;
 	}
 
@@ -227,10 +262,12 @@ public class SystemMonitor extends JFrame {
 		painel.add(rega2);
 		painel.add(rega3);
 
+		criarListaClientes(painel, "Jardim");
+		
 		return painel;
 	}
 
-
+	
 
 	/**
 	 * 
@@ -253,7 +290,7 @@ public class SystemMonitor extends JFrame {
 
 			// register with the server
 			String area=args[2];
-			out.writeObject(new RegistrationMessage("All", iscot.enums.Type.DECIDER ,Integer.parseInt(args[2])));
+			out.writeObject(new RegistrationMessage("ALL", iscot.enums.Type.DECIDER ,Integer.parseInt(args[2])));
 
 			SystemMonitor gui=new SystemMonitor();;
 			SwingUtilities.invokeLater(() -> {
