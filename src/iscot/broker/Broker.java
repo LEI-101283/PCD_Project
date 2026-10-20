@@ -1,6 +1,8 @@
 package iscot.broker;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,5 +61,14 @@ public class Broker {
 	private boolean noMessageFor(Type type, Areas area) {
 //		System.err.println("Checking messages for:"+area+" Type:"+type);
 		return messages.get(type).isEmpty() ||  messages.get(type).get(0).area!=area;
+	}
+
+	// Just returns the queue, without any consequence in queue state, no remocals
+	public List<Message> checkMessageQueue() {
+		List<Message> returnedMessages=new ArrayList<>();
+		Collection<List<Message>> allLists=messages.values();
+//		for(List<Message> list:allLists)
+		returnedMessages.addAll(returnedMessages);
+		return returnedMessages;
 	}
 }

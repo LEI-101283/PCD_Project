@@ -14,6 +14,8 @@ import iscot.message.Message;
 import iscot.message.RegistrationMessage;
 import iscot.message.sensor.LightSensorMessage;
 import iscot.message.sensor.TemperatureSensorMessage;
+import iscot.monitor.SystemMonitor.DebugThread;
+import iscot.monitor.SystemMonitor.MonitorThread;
 import iscot.server.Client;
 import iscot.server.DealWithClient;
 import iscot.server.Server;
@@ -45,11 +47,47 @@ public class SystemMonitor {
 			this.panel=panel;
 			// TODO Auto-generated constructor stub
 		}
-		private Server server;
+		public JPanel getPanel() {
+			return panel;
+		}
 		private JPanel panel;
 
 	}
-	
+
+	public class DebugThread extends MonitorThread {
+		public DebugThread(Server server, Areas area, JPanel panel) {
+			super(server, area, panel);
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public Type getType() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void run() {
+			while(true) {
+				clearLog();
+				for(Message message:server.checkMessageQueue()) {
+					System.out.println("Monitor logging:"+message);
+					log(message.toString());
+				}
+				getPanel().invalidate();
+				try {
+					sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+
+
+
+	}
+
 	public class WcThread extends MonitorThread{
 
 		public WcThread(Server server,JPanel jPanel) {
@@ -61,20 +99,20 @@ public class SystemMonitor {
 			try {
 				Message message=server.getMessage(Type.SENSOR, getArea());
 				System.out.println("WC got "+message);
-				
-				
+
+
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
 
 		@Override
 		public Type getType() {
 			return Type.DECIDER;
 		}
-		
+
 	}
 	private final Map<Integer, String> debugMessages =
 			new LinkedHashMap<>();
@@ -87,6 +125,7 @@ public class SystemMonitor {
 
 	private final Map<String, DefaultListModel<String>> clientesPorArea =
 			new LinkedHashMap<>();
+
 	private Server server;
 
 	private int nextLogId = 0;
@@ -99,20 +138,21 @@ public class SystemMonitor {
 		JPanel quartoPanel=criarDivisao("Quarto", true); 
 		JPanel salaPanel=criarDivisao("Sala", true);
 		JPanel jardimPanel=criarJardim();
-		
+
 		// Lançar threads
 		WcThread wcThread=new WcThread(server,wcPanel);
 		wcThread.start();
-		
+
 		abrirJanela("Cozinha", cozinhaPanel);
 		abrirJanela("WC", wcPanel);
 		abrirJanela("Sala",salaPanel);
 		abrirJanela("Quarto", quartoPanel);
 		abrirJanela("Jardim", jardimPanel);
 
-		
-		abrirJanelaDebug();
 
+		JPanel debugPanel= abrirJanelaDebug();
+		DebugThread debugThread= new DebugThread(server,null,debugPanel);
+		debugThread.start();
 
 		// DEBUG
 		log("TESTE");
@@ -120,7 +160,7 @@ public class SystemMonitor {
 
 	}
 
-	private void abrirJanelaDebug() {
+	private JPanel abrirJanelaDebug() {
 		JPanel painel = new JPanel(new BorderLayout());
 
 		painel.setBorder(
@@ -136,6 +176,7 @@ public class SystemMonitor {
 		janela.setLocation(450, 580);
 		// Janela de debug na parte inferior do ecrã
 		janela.setVisible(true);
+		return painel;
 	}
 
 	private void abrirJanela(String titulo, JPanel conteudo) {
@@ -155,13 +196,19 @@ public class SystemMonitor {
 				{20, 580}    // Jardim
 		};
 
-		int indice = switch (titulo) {
-		case "Cozinha" -> 0;
-		case "WC" -> 1;
-		case "Sala" -> 2;
-		case "Quarto" -> 3;
-		case "Jardim" -> 4;
-		default -> -1;
+		int indice;
+		switch (titulo) {
+		case "Cozinha": indice=0;
+		break;
+		case "WC": indice= 1;
+		break;
+		case "Sala" : indice=2;
+		break;
+		case "Quarto" : indice=3;
+		break;
+		case "Jardim" : indice=4;
+		break;
+		default : indice=-1;
 		};
 
 		if (indice >= 0) {

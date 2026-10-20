@@ -93,7 +93,9 @@ public class Server {
 	public Message getMessage(Type type, Areas areas2) throws InterruptedException {
 		return 	broker.getMessage(type, areas2); // single message in requested area
 	}
-
+	public List<Message> checkMessageQueue(){
+		return broker.checkMessageQueue();
+	}
 	public int countClientsFor(Type type, Areas area) {
 		int count=0;
 		for(Client client:areas.get(area).getClients())
