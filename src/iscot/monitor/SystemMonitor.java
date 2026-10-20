@@ -61,6 +61,8 @@ public class SystemMonitor {
 			try {
 				Message message=server.getMessage(Type.SENSOR, getArea());
 				System.out.println("WC got "+message);
+				
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -72,9 +74,6 @@ public class SystemMonitor {
 		public Type getType() {
 			return Type.DECIDER;
 		}
-		
-		
-		
 	}
 	private final Map<Integer, String> debugMessages =
 			new LinkedHashMap<>();
