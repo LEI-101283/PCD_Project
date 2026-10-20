@@ -74,6 +74,7 @@ public class SystemMonitor {
 		public Type getType() {
 			return Type.DECIDER;
 		}
+		
 	}
 	private final Map<Integer, String> debugMessages =
 			new LinkedHashMap<>();
