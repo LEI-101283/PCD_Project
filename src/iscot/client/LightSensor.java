@@ -63,6 +63,9 @@ public class LightSensor {
 			janela.setMinimumSize(janela.getSize());
 			janela.pack();
 			janela.setVisible(true);
+			
+			// Send message with initial value
+			out.writeObject(new LightSensorMessage(area, (float)sensorControl.getValor()));
 		}
 	}
 
