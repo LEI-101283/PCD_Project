@@ -1,5 +1,6 @@
 package iscot.message.sensor;
 
+import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.Message;
 
@@ -10,7 +11,7 @@ public abstract class SensorMessage extends Message {
 		return Type.SENSOR;
 	}
 
-	public SensorMessage(String area) {
+	public SensorMessage(Areas area) {
 		super(area);
 	}
 

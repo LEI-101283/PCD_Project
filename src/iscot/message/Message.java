@@ -16,7 +16,7 @@ public abstract class Message implements Serializable {
 	
 	public abstract Type getType();
 
-	public Message(String area) {
-		this.area = Areas.valueOf(area);
+	public Message(Areas area) {
+		this.area = area;
 	}
 }

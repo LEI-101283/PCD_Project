@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.RegistrationMessage;
 import iscot.message.sensor.LightSensorMessage;
@@ -17,7 +18,6 @@ public class LightSensor {
 	 * 
 	 * @param server address and port
 	 * @param roomName: string
-	 * @param id: int
 	 * @throws IOException 
 	 * @throws UnknownHostException 
 	 * @throws NumberFormatException 
@@ -33,7 +33,7 @@ public class LightSensor {
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream()); // useless, no incoming messages
 
 			// register with the server
-			String area=args[2];
+			Areas area=Areas.valueOf(args[2]);
 			out.writeObject(new RegistrationMessage(area, Type.SENSOR));
 
 			while(true) {

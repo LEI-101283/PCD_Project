@@ -72,7 +72,7 @@ public class SystemMonitor {
 
 		@Override
 		public void update(Observable arg0, Object arg1) {
-			
+
 			Object obj=arg1;
 			if(obj instanceof Message) {
 				Message message=(Message)obj;
@@ -126,8 +126,8 @@ public class SystemMonitor {
 		}
 
 	}
-//	private final Map<Integer, String> debugMessages =
-//			new LinkedHashMap<>();
+	//	private final Map<Integer, String> debugMessages =
+	//			new LinkedHashMap<>();
 
 	private final DefaultListModel<String> debugListModel =
 			new DefaultListModel<>();
@@ -144,7 +144,7 @@ public class SystemMonitor {
 	JTextField sensorIluminacaoSala;
 
 	private JTextField sensorIluminacaoQuarto;
-//	private int nextLogId = 0;
+	//	private int nextLogId = 0;
 	public SystemMonitor(Server server) throws IOException {
 		this.server=server;
 		// Distribuir as janelas em duas colunas
@@ -171,7 +171,7 @@ public class SystemMonitor {
 		debugThread.start();
 
 		// DEBUG
-//		log("TESTE");
+		//		log("TESTE");
 		System.err.println("Janelas lançadas!");
 
 	}
@@ -246,9 +246,12 @@ public class SystemMonitor {
 
 	private JTextField adicionarLinha(JPanel painel, String etiqueta,String texto) {
 		painel.add(new JLabel(etiqueta));
-		JTextField valor=new JTextField(texto);
-		painel.add(valor);
-		return valor;
+		if(texto.length()>0) {
+			JTextField valor=new JTextField(texto);
+			painel.add(valor);
+			return valor;
+		}
+		return null; 
 	}
 
 	private void criarListaClientes(JPanel painel, String area) {
@@ -314,21 +317,21 @@ public class SystemMonitor {
 		});
 	}
 
-//
-//	public void removeLogMessage(int id) {
-//		SwingUtilities.invokeLater(() -> {
-//			if (debugMessages.containsKey(id)) {
-//				debugMessages.remove(id);
-//
-//				for (int i = 0; i < debugListModel.size(); i++) {
-//					if (debugListModel.getElementAt(i).startsWith("["+i+"]")) {
-//						debugListModel.remove(i);
-//						break;
-//					}
-//				}
-//			}
-//		});
-//	}
+	//
+	//	public void removeLogMessage(int id) {
+	//		SwingUtilities.invokeLater(() -> {
+	//			if (debugMessages.containsKey(id)) {
+	//				debugMessages.remove(id);
+	//
+	//				for (int i = 0; i < debugListModel.size(); i++) {
+	//					if (debugListModel.getElementAt(i).startsWith("["+i+"]")) {
+	//						debugListModel.remove(i);
+	//						break;
+	//					}
+	//				}
+	//			}
+	//		});
+	//	}
 	public void clearLog() {
 		SwingUtilities.invokeLater(() -> {
 			debugListModel.clear();
@@ -343,15 +346,15 @@ public class SystemMonitor {
 		JCheckBox luz = new JCheckBox("Luz ligada");
 		painel.add(luz);
 
-		adicionarLinha(painel, "Posição do estore:","");
+//		adicionarLinha(painel, "Posição do estore:","");
+//
+//		JSlider estore = new JSlider(0, 100, 0);
+//		estore.setMajorTickSpacing(25);
+//		estore.setPaintTicks(true);
+//		estore.setPaintLabels(true);
+//		painel.add(estore);
 
-		JSlider estore = new JSlider(0, 100, 0);
-		estore.setMajorTickSpacing(25);
-		estore.setPaintTicks(true);
-		estore.setPaintLabels(true);
-		painel.add(estore);
-
-		adicionarLinha(painel,"Estore:", "0%");
+//		adicionarLinha(painel,"Estore:", "0%");
 		criarListaClientes(painel, "Cozinha");
 
 		return painel;
