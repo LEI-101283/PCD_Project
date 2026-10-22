@@ -9,19 +9,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-
 import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.Message;
 import iscot.message.RegistrationMessage;
 import iscot.message.sensor.LightSensorMessage;
 import iscot.message.sensor.TemperatureSensorMessage;
-import iscot.monitor.SystemMonitor.DebugThread;
 import iscot.monitor.SystemMonitor.MonitorThread;
 import iscot.server.Client;
 import iscot.server.DealWithClient;
 import iscot.server.Server;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
@@ -42,57 +39,17 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
-public class SystemMonitor {
+public class SystemMonitor implements Observer {
 
 	public abstract class MonitorThread extends Client{
 		public MonitorThread(Server server, Areas area,JPanel panel) {
 			super(server, area);
 			this.panel=panel;
-			// TODO Auto-generated constructor stub
 		}
 		public JPanel getPanel() {
 			return panel;
 		}
 		private JPanel panel;
-
-	}
-
-	public class DebugThread extends MonitorThread implements Observer {
-		public DebugThread(Server server, Areas area, JPanel panel) {
-			super(server, area, panel);
-			server.addObserver(this);
-		}
-
-		@Override
-		public Type getType() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-
-		@Override
-		public void update(Observable arg0, Object arg1) {
-
-			Object obj=arg1;
-			if(obj instanceof Message) {
-				Message message=(Message)obj;
-				if(logMessageExists(message)) {
-					removeLogMessage(message.toString());
-					log("Deleted:"+message.toString());
-				}
-				else { 
-					log(message.toString());
-				}
-			} else {// Client!
-				log(obj.toString());
-				Client client=(Client)obj;
-				adicionarCliente(client.getArea(), client.getClientId()+"-"+client.getType());
-			}
-			numMessagesLabel.setText(  server==null ||server.checkMessageQueue()==null?"0": server.checkMessageQueue().size()+"");
-			getPanel().invalidate();
-		}
-
-
 
 	}
 
@@ -106,8 +63,8 @@ public class SystemMonitor {
 		public void run() {
 			try {
 				while(true) {
-					Message message=server.getMessage(Type.SENSOR, getArea());
-//					System.out.println("Sala got "+message);
+					Message message=server.getMessage(Type.SENSOR, getArea(),getClientId());
+					//					System.out.println("Sala got "+message);
 					if(message instanceof LightSensorMessage) {
 						System.err.println("Updating GUI to"+((LightSensorMessage)message));
 						sensorIluminacaoSala.setText(((LightSensorMessage)message).light+"");
@@ -129,9 +86,35 @@ public class SystemMonitor {
 		}
 
 	}
-	//	private final Map<Integer, String> debugMessages =
-	//			new LinkedHashMap<>();
 
+
+	@Override
+	public void update(Observable arg0, Object arg1) {
+
+		Object obj=arg1;
+		if(obj instanceof Message) {
+			Message message=(Message)obj;
+			if(logMessageExists(message)) {
+				removeLogMessage(message.toString());
+				log("Deleted:"+message.toString());
+			}
+			else { 
+				log(message.toString());
+			}
+		} else {// Client!
+			log(obj.toString());
+			Client client=(Client)obj;
+			adicionarCliente(client.getArea(), client.getClientId()+"-"+client.getType());
+		}
+
+		// # messages on top
+		if(server==null)
+			numMessagesLabel.setText("null");
+		else
+			numMessagesLabel.setText(server.checkMessageQueue()==null?"0": server.checkMessageQueue().size()+"");
+		debugList.invalidate();
+	}
+	
 	private final DefaultListModel<String> debugListModel =
 			new DefaultListModel<>();
 
@@ -146,12 +129,14 @@ public class SystemMonitor {
 	// editable components
 	JTextField sensorIluminacaoSala;
 	JLabel numMessagesLabel;
-	
+
 	private JTextField sensorIluminacaoQuarto;
 	//	private int nextLogId = 0;
 	public SystemMonitor(Server server) throws IOException {
 		this.server=server;
-		// Distribuir as janelas em duas colunas
+
+
+		server.addObserver(this);
 
 		JPanel cozinhaPanel= criarCozinha();
 		JPanel wcPanel=criarWC();
@@ -171,8 +156,6 @@ public class SystemMonitor {
 
 
 		JPanel debugPanel= abrirJanelaDebug();
-		DebugThread debugThread= new DebugThread(server,null,debugPanel);
-		debugThread.start();
 
 		// DEBUG
 		//		log("TESTE");
@@ -188,6 +171,13 @@ public class SystemMonitor {
 				);
 
 		painel.add(new JScrollPane(debugList), BorderLayout.CENTER);
+
+		numMessagesLabel=new JLabel("0");
+		painel.add(
+				numMessagesLabel,
+				BorderLayout.NORTH
+				);
+
 
 		JFrame janela = new JFrame("Debug");
 		janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -283,28 +273,6 @@ public class SystemMonitor {
 		});
 	}
 
-	// DEBUG
-	public JPanel criarDebug() {
-		JPanel debugPanel = new JPanel(new BorderLayout());
-
-		debugPanel.setBorder(
-				BorderFactory.createTitledBorder("Debug / Mensagens do sistema")
-				);
-
-		debugPanel.add(
-				new JScrollPane(debugList),
-				BorderLayout.CENTER
-				);
-		debugPanel.setLocation(450,500);
-		
-		numMessagesLabel=new JLabel("0");
-		debugPanel.add(
-				numMessagesLabel,
-				BorderLayout.NORTH
-				);
-
-		return debugPanel;
-	}
 
 
 	public void log(String mensagem) {
@@ -356,15 +324,15 @@ public class SystemMonitor {
 		JCheckBox luz = new JCheckBox("Luz ligada");
 		painel.add(luz);
 
-//		adicionarLinha(painel, "Posição do estore:","");
-//
-//		JSlider estore = new JSlider(0, 100, 0);
-//		estore.setMajorTickSpacing(25);
-//		estore.setPaintTicks(true);
-//		estore.setPaintLabels(true);
-//		painel.add(estore);
+		//		adicionarLinha(painel, "Posição do estore:","");
+		//
+		//		JSlider estore = new JSlider(0, 100, 0);
+		//		estore.setMajorTickSpacing(25);
+		//		estore.setPaintTicks(true);
+		//		estore.setPaintLabels(true);
+		//		painel.add(estore);
 
-//		adicionarLinha(painel,"Estore:", "0%");
+		//		adicionarLinha(painel,"Estore:", "0%");
 		criarListaClientes(painel, "Cozinha");
 
 		return painel;

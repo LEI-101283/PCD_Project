@@ -100,8 +100,8 @@ public class Server extends Observable{
 
 	}
 
-	public Message getMessage(Type type, Areas areas2) throws InterruptedException {
-		return 	broker.getMessage(type, areas2); // single message in requested area
+	public Message getMessage(Type type, Areas areas2, int clientNumber) throws InterruptedException {
+		return 	broker.getMessage(type, areas2,clientNumber); // single message in requested area
 	}
 	public List<Message> checkMessageQueue(){
 		return broker.checkMessageQueue();

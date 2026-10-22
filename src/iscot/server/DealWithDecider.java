@@ -21,34 +21,42 @@ public class DealWithDecider extends DealWithClient {
 	public void run() {
 		// Create thread to send relevant messages
 		new Thread( new Runnable() {
-			
+
 			@Override
 			public void run() {
+
 				HighLevelOrderMessage highLevelOrderMessage;
-				try {
-					highLevelOrderMessage = (HighLevelOrderMessage)in.readObject();
-					System.err.println("Got HighLevelOrderMessage:"+highLevelOrderMessage);
-					server.queueMessage(highLevelOrderMessage);
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				while(true) {
+					try {
+						highLevelOrderMessage = (HighLevelOrderMessage)in.readObject();
+						System.err.println("Got HighLevelOrderMessage:"+highLevelOrderMessage);
+						server.queueMessage(highLevelOrderMessage);
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-				
+
 			}
 		}).start();
 		while(true)
 			try {
 				// TODO: deal with other deciders
-				Message message=server.getMessage(Type.SENSOR, getArea());
+				Message message=server.getMessage(Type.SENSOR, getArea(),getClientId());
 				System.err.println("Decider got: "+message);
 				out.writeObject(message);
 			} catch (InterruptedException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+	}
+
+	@Override
+	public Type getType() {
+		return Type.DECIDER;
 	}
 
 	@Override

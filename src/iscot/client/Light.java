@@ -57,6 +57,7 @@ public class Light {
 			janela.setContentPane(painel);
 			janela.setLocation(600, 400);
 			janela.setMinimumSize(janela.getSize());
+			janela.pack();
 			janela.setVisible(true);
 
 			while(true) {

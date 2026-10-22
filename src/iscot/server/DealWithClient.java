@@ -53,10 +53,10 @@ public class DealWithClient extends Client{
 	}
 
 
-	@Override
-	public String toString() {
-		return "DealWithClient [getArea()=" + getArea() + ", getClientId()=" + getClientId() + "]";
-	}
+//	@Override
+//	public  String toString() {
+//		return "DealWithClient [getArea()=" + getArea() + ", getClientId()=" + getClientId() + "]";
+//	}
 
 
 	@Override

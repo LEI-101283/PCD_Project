@@ -21,13 +21,18 @@ public class DealWithActuator extends DealWithClient {
 		while(true)
 			try {
 				// TODO: deal with other deciders
-				Message message=server.getMessage(Type.DECIDER, getArea());
-				System.err.println("Actuator got: "+message);
+				Message message=server.getMessage(Type.DECIDER, getArea(),getClientId());
+				System.err.println(this+" got: "+message);
 				out.writeObject(message);
 			} catch (InterruptedException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+	}
+
+	@Override
+	public Type getType() {
+		return Type.ACTUATOR;
 	}
 
 	@Override

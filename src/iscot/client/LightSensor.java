@@ -1,11 +1,17 @@
 package iscot.client;
 
+import java.awt.BorderLayout;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import iscot.client.gui.IconeLuz;
+import iscot.client.gui.SensorControl;
 import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.RegistrationMessage;
@@ -36,10 +42,27 @@ public class LightSensor {
 			Areas area=Areas.valueOf(args[2]);
 			out.writeObject(new RegistrationMessage(area, Type.SENSOR));
 
-			while(true) {
-				out.writeObject(new LightSensorMessage(area,(float)(100+Math.random()*1000)));
-				Thread.sleep(5000);
-			}
+			JFrame janela = new JFrame("Luz em "+area);
+			janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+			
+			// Criar os componentes gráficos
+			JPanel painel=new JPanel();
+			painel.setLayout(new BorderLayout());
+			SensorControl sensorControl= new SensorControl( "☀", "Luminosidade da sala", "lux",
+				    0, 2000, 10, 320,
+				    valor -> {try {
+						out.writeObject(new LightSensorMessage(area, (float) valor));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}});
+			painel.add(sensorControl,BorderLayout.CENTER);
+			janela.setContentPane(painel);
+			janela.setLocation(600, 400);
+			janela.setMinimumSize(janela.getSize());
+			janela.pack();
+			janela.setVisible(true);
 		}
 	}
 
