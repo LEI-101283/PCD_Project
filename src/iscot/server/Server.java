@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 
 import iscot.area.Area;
 import iscot.broker.Broker;
@@ -17,9 +18,9 @@ import iscot.enums.Type;
 import iscot.message.Message;
 import iscot.message.sensor.LightSensorMessage;
 import iscot.monitor.SystemMonitor;
-import iscot.monitor.SystemMonitor.WcThread;
 
-public class Server {
+@SuppressWarnings("deprecation")
+public class Server extends Observable{
 	private Broker broker= new Broker(this);
 	private ServerSocket serverSocket;
 	private Map<Areas,Area> areas= new HashMap<>();
@@ -47,7 +48,7 @@ public class Server {
 			Server server= new Server(portNumber,areas);
 			new SystemMonitor(server);
 			server.startServing();	
-			
+
 		}
 	}
 
@@ -68,9 +69,13 @@ public class Server {
 			throw new IllegalArgumentException("Invalid Area:"+client.getArea());
 		if(isAlreadyRegistered(client))
 			throw new IllegalArgumentException("Sensor already registered!");
-		
+
 		areas.get(client.getArea()).getClients().add(client);
-		
+
+		// Debug
+		setChanged();
+		notifyObservers(client);
+
 	}
 
 	private boolean areaExists(Areas areas2) {
@@ -88,8 +93,13 @@ public class Server {
 
 	public void queueMessage(Message message) {
 		broker.queueMessage(message);
+
+		// Debug
+		setChanged();
+		notifyObservers(message);
+
 	}
-	
+
 	public Message getMessage(Type type, Areas areas2) throws InterruptedException {
 		return 	broker.getMessage(type, areas2); // single message in requested area
 	}
@@ -104,6 +114,12 @@ public class Server {
 			else if(client.getType()==Type.ACTUATOR && type==Type.DECIDER)
 				count++;
 		return count;
+	}
+
+	public void notifyDeletedMessage(Message message) {
+		// Debug
+		setChanged();
+		notifyObservers(message);		
 	}
 
 }

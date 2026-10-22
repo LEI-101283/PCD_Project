@@ -15,7 +15,7 @@ import iscot.enums.Type;
 import iscot.message.Message;
 import iscot.server.Server;
 
-public class Broker {
+public class Broker{
 	private Map<Type,List<Message>> messages =new HashMap<Type, List<Message>>();
 	private Map<Message,CountDownLatch> cdls=new HashMap<Message,CountDownLatch>();
 	private Server server;
@@ -34,11 +34,11 @@ public class Broker {
 			public void run() {				
 				try {
 					cdl.await();
+					removeMessage(message);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				removeMessage(message);
 			}
 		}).start();
 		notifyAll();
@@ -47,7 +47,9 @@ public class Broker {
 	
 	protected synchronized void removeMessage(Message message) {
 		messages.get(message.getType()).remove(message);
+		cdls.remove(message);
 		notifyAll();
+		server.notifyDeletedMessage(message);
 	}
 
 	public synchronized Message getMessage(Type type, Areas area) throws InterruptedException {

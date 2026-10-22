@@ -37,7 +37,7 @@ public class LightSensor {
 			out.writeObject(new RegistrationMessage(area, Type.SENSOR));
 
 			while(true) {
-				out.writeObject(new LightSensorMessage(area,(float)(17+Math.random()*6)));
+				out.writeObject(new LightSensorMessage(area,(float)(100+Math.random()*1000)));
 				Thread.sleep(5000);
 			}
 		}

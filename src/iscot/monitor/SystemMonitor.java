@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 import iscot.enums.Areas;
 import iscot.enums.Type;
@@ -35,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
@@ -54,10 +57,10 @@ public class SystemMonitor {
 
 	}
 
-	public class DebugThread extends MonitorThread {
+	public class DebugThread extends MonitorThread implements Observer {
 		public DebugThread(Server server, Areas area, JPanel panel) {
 			super(server, area, panel);
-			// TODO Auto-generated constructor stub
+			server.addObserver(this);
 		}
 
 		@Override
@@ -66,41 +69,50 @@ public class SystemMonitor {
 			return null;
 		}
 
+
 		@Override
-		public void run() {
-			while(true) {
-				clearLog();
-				for(Message message:server.checkMessageQueue()) {
-					System.out.println("Monitor logging:"+message);
+		public void update(Observable arg0, Object arg1) {
+			
+			Object obj=arg1;
+			if(obj instanceof Message) {
+				Message message=(Message)obj;
+				if(logMessageExists(message)) {
+					removeLogMessage(message.toString());
+					log("Deleted:"+message.toString());
+				}
+				else { 
 					log(message.toString());
 				}
-				getPanel().invalidate();
-				try {
-					sleep(500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			} else {// Client!
+				log(obj.toString());
+				Client client=(Client)obj;
+				adicionarCliente(client.getArea(), client.getClientId()+"-"+client.getType());
 			}
+			getPanel().invalidate();
 		}
 
 
 
 	}
 
-	public class WcThread extends MonitorThread{
+	public class SalaThread extends MonitorThread{
 
-		public WcThread(Server server,JPanel jPanel) {
-			super(server, Areas.WC,jPanel);
+		public SalaThread(Server server,JPanel jPanel) {
+			super(server, Areas.Sala,jPanel);
 		}
 
 		@Override
 		public void run() {
 			try {
-				Message message=server.getMessage(Type.SENSOR, getArea());
-				System.out.println("WC got "+message);
-
-
+				while(true) {
+					Message message=server.getMessage(Type.SENSOR, getArea());
+					System.out.println("Sala got "+message);
+					if(message instanceof LightSensorMessage) {
+						System.err.println("Updating GUI to"+((LightSensorMessage)message));
+						sensorIluminacaoSala.setText(((LightSensorMessage)message).light+"");
+						sensorIluminacaoSala.invalidate();
+					}
+				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -114,8 +126,8 @@ public class SystemMonitor {
 		}
 
 	}
-	private final Map<Integer, String> debugMessages =
-			new LinkedHashMap<>();
+//	private final Map<Integer, String> debugMessages =
+//			new LinkedHashMap<>();
 
 	private final DefaultListModel<String> debugListModel =
 			new DefaultListModel<>();
@@ -128,20 +140,24 @@ public class SystemMonitor {
 
 	private Server server;
 
-	private int nextLogId = 0;
+	// editable components
+	JTextField sensorIluminacaoSala;
+
+	private JTextField sensorIluminacaoQuarto;
+//	private int nextLogId = 0;
 	public SystemMonitor(Server server) throws IOException {
 		this.server=server;
 		// Distribuir as janelas em duas colunas
 
 		JPanel cozinhaPanel= criarCozinha();
 		JPanel wcPanel=criarWC();
-		JPanel quartoPanel=criarDivisao("Quarto", true); 
-		JPanel salaPanel=criarDivisao("Sala", true);
+		JPanel quartoPanel=criarQuarto(true); 
+		JPanel salaPanel=criarSala(true);
 		JPanel jardimPanel=criarJardim();
 
 		// Lançar threads
-		WcThread wcThread=new WcThread(server,wcPanel);
-		wcThread.start();
+		SalaThread salaThread=new SalaThread(server,salaPanel);
+		salaThread.start();
 
 		abrirJanela("Cozinha", cozinhaPanel);
 		abrirJanela("WC", wcPanel);
@@ -155,7 +171,7 @@ public class SystemMonitor {
 		debugThread.start();
 
 		// DEBUG
-		log("TESTE");
+//		log("TESTE");
 		System.err.println("Janelas lançadas!");
 
 	}
@@ -228,8 +244,11 @@ public class SystemMonitor {
 		return painel;
 	}
 
-	private void adicionarLinha(JPanel painel, String texto) {
-		painel.add(new JLabel(texto));
+	private JTextField adicionarLinha(JPanel painel, String etiqueta,String texto) {
+		painel.add(new JLabel(etiqueta));
+		JTextField valor=new JTextField(texto);
+		painel.add(valor);
+		return valor;
 	}
 
 	private void criarListaClientes(JPanel painel, String area) {
@@ -244,17 +263,16 @@ public class SystemMonitor {
 		painel.add(new JScrollPane(lista));
 	}
 
-	public void adicionarCliente(String area, String cliente) {
+	public void adicionarCliente(Areas areas, String string) {
 		SwingUtilities.invokeLater(() -> {
-			DefaultListModel<String> modelo = clientesPorArea.get(area);
+			DefaultListModel<String> modelo = clientesPorArea.get(areas.toString());
 
 			if (modelo == null) {
 				throw new IllegalArgumentException(
-						"Área desconhecida: " + area
+						"Área desconhecida: " + areas
 						);
 			}
-
-			modelo.addElement(cliente);
+			modelo.addElement(string);
 		});
 	}
 
@@ -278,10 +296,7 @@ public class SystemMonitor {
 
 	public void log(String mensagem) {
 		SwingUtilities.invokeLater(() -> {
-			int id = nextLogId++;
-
-			debugMessages.put(id, mensagem);
-			debugListModel.addElement("["+id+"] - "+mensagem );
+			debugListModel.addElement(mensagem.toString() );
 
 			int last = debugListModel.size() - 1;
 			debugList.setSelectedIndex(last);
@@ -289,24 +304,33 @@ public class SystemMonitor {
 		});
 	}
 
-	public void removeLogMessage(int id) {
+	public boolean logMessageExists(Message message) {
+		return debugListModel.contains(message.toString());
+	}
+	public void removeLogMessage(String mensagem) {
 		SwingUtilities.invokeLater(() -> {
-			if (debugMessages.containsKey(id)) {
-				debugMessages.remove(id);
-
-				for (int i = 0; i < debugListModel.size(); i++) {
-					if (debugListModel.getElementAt(i).startsWith("["+i+"]")) {
-						debugListModel.remove(i);
-						break;
-					}
-				}
-			}
+			if (debugListModel.contains(mensagem.toString())) 
+				debugListModel.removeElement(mensagem.toString());
 		});
 	}
 
+//
+//	public void removeLogMessage(int id) {
+//		SwingUtilities.invokeLater(() -> {
+//			if (debugMessages.containsKey(id)) {
+//				debugMessages.remove(id);
+//
+//				for (int i = 0; i < debugListModel.size(); i++) {
+//					if (debugListModel.getElementAt(i).startsWith("["+i+"]")) {
+//						debugListModel.remove(i);
+//						break;
+//					}
+//				}
+//			}
+//		});
+//	}
 	public void clearLog() {
 		SwingUtilities.invokeLater(() -> {
-			debugMessages.clear();
 			debugListModel.clear();
 		});
 	}
@@ -314,12 +338,12 @@ public class SystemMonitor {
 	private JPanel criarCozinha() {
 		JPanel painel = criarPainel("Cozinha");
 
-		adicionarLinha(painel, "Sensor de iluminação: 320 lux");
+		adicionarLinha(painel, "Sensor de iluminação:","320 lux");
 
 		JCheckBox luz = new JCheckBox("Luz ligada");
 		painel.add(luz);
 
-		adicionarLinha(painel, "Posição do estore:");
+		adicionarLinha(painel, "Posição do estore:","");
 
 		JSlider estore = new JSlider(0, 100, 0);
 		estore.setMajorTickSpacing(25);
@@ -327,12 +351,7 @@ public class SystemMonitor {
 		estore.setPaintLabels(true);
 		painel.add(estore);
 
-		JLabel posicao = new JLabel("Estore: 0%");
-		painel.add(posicao);
-
-		estore.addChangeListener(e ->
-		posicao.setText("Estore: " + estore.getValue() + "%"));
-
+		adicionarLinha(painel,"Estore:", "0%");
 		criarListaClientes(painel, "Cozinha");
 
 		return painel;
@@ -342,7 +361,7 @@ public class SystemMonitor {
 	private JPanel criarWC() {
 		JPanel painel = criarPainel("WC");
 
-		adicionarLinha(painel, "Sensor de humidade: 68%");
+		JTextField sensorHumidadeWC= adicionarLinha(painel, "Sensor de humidade:", "68%");
 
 		JCheckBox ventilacao = new JCheckBox("Ventilação ligada");
 		painel.add(ventilacao);
@@ -353,11 +372,11 @@ public class SystemMonitor {
 	}
 
 	// SALA E QUARTO
-	private JPanel criarDivisao(String nome, boolean arCondicionado) {
-		JPanel painel = criarPainel(nome);
+	private JPanel criarQuarto(boolean arCondicionado) {
+		JPanel painel = criarPainel("Quarto");
 
-		adicionarLinha(painel, "Sensor de temperatura: 22.5 °C");
-		adicionarLinha(painel, "Sensor de iluminação: 250 lux");
+		adicionarLinha(painel, "Sensor de temperatura:", "22.5 °C");
+		sensorIluminacaoQuarto= adicionarLinha(painel, "Sensor de iluminação:", "250 lux");
 
 		JCheckBox teto = new JCheckBox("Lâmpada de teto ligada");
 		painel.add(teto);
@@ -366,7 +385,7 @@ public class SystemMonitor {
 		painel.add(candeeiro);
 
 		if (arCondicionado) {
-			adicionarLinha(painel, "Ar condicionado:");
+			adicionarLinha(painel, "Ar condicionado:","");
 
 			JComboBox<String> modoAC = new JComboBox<>(
 					new String[] {
@@ -378,7 +397,38 @@ public class SystemMonitor {
 			painel.add(modoAC);
 		}
 
-		criarListaClientes(painel, nome);
+		criarListaClientes(painel, "Quarto");
+
+		return painel;
+	}
+
+
+	private JPanel criarSala( boolean arCondicionado) {
+		JPanel painel = criarPainel("Sala");
+
+		adicionarLinha(painel, "Sensor de temperatura:", "22.5 °C");
+		sensorIluminacaoSala= adicionarLinha(painel, "Sensor de iluminação:", "250 lux");
+
+		JCheckBox teto = new JCheckBox("Lâmpada de teto ligada");
+		painel.add(teto);
+
+		JCheckBox candeeiro = new JCheckBox("Candeeiro ligado");
+		painel.add(candeeiro);
+
+		if (arCondicionado) {
+			adicionarLinha(painel, "Ar condicionado:","");
+
+			JComboBox<String> modoAC = new JComboBox<>(
+					new String[] {
+							"Desligado",
+							"Frio",
+							"Quente",
+							"Ventilação"
+					});
+			painel.add(modoAC);
+		}
+
+		criarListaClientes(painel, "Sala");
 
 		return painel;
 	}
@@ -387,10 +437,10 @@ public class SystemMonitor {
 	private JPanel criarJardim() {
 		JPanel painel = criarPainel("Jardim");
 
-		adicionarLinha(painel, "Humidade do solo: 42%");
-		adicionarLinha(painel, "Pluviosidade: 0 mm/h");
+		adicionarLinha(painel, "Humidade do solo:"," 42%");
+		adicionarLinha(painel, "Pluviosidade:"," 0 mm/h");
 
-		adicionarLinha(painel, "Comandos de rega:");
+		adicionarLinha(painel, "Comandos de rega:","");
 
 		JCheckBox rega1 = new JCheckBox("Área de rega 1 ligada");
 		JCheckBox rega2 = new JCheckBox("Área de rega 2 ligada");
