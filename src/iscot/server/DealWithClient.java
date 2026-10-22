@@ -17,7 +17,7 @@ public class DealWithClient extends Client{
 		this.out=out;
 	}
 	protected ObjectInputStream in;
-	private ObjectOutputStream out;
+	protected ObjectOutputStream out;
 	
 	
 	@Override
@@ -36,13 +36,26 @@ public class DealWithClient extends Client{
 				DealWithDecider dealWithDecider=new DealWithDecider(in, out,server,registrationMessage.area);
 				server.register(dealWithDecider);
 				dealWithDecider.start();
+				break;
+			case ACTUATOR:
+				DealWithActuator dealWithActuator= new DealWithActuator(in, out, server, registrationMessage.area);
+				server.register(dealWithActuator);
+				dealWithActuator.start();
+				break;
 			default:
+				System.err.println("Unexpected client registration:"+registrationMessage);
 				break;
 			}
 		} catch (ClassNotFoundException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+
+	@Override
+	public String toString() {
+		return "DealWithClient [getArea()=" + getArea() + ", getClientId()=" + getClientId() + "]";
 	}
 
 

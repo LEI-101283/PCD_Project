@@ -43,18 +43,20 @@ public class Light {
 
 			// register with the server
 			Areas area=Areas.valueOf(args[2]);
-			out.writeObject(new RegistrationMessage(area, Type.SENSOR));
+			out.writeObject(new RegistrationMessage(area, Type.ACTUATOR));
 
-			JFrame janela = new JFrame("Monitorização de componentes");
-
+			JFrame janela = new JFrame("Luz em "+area);
 			janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-			JPanel painel = new JPanel(new BorderLayout());
-
+			
 			// Criar os componentes gráficos
+			JPanel painel=new JPanel();
+			painel.setLayout(new BorderLayout());
 			IconeLuz luz = new IconeLuz();
 			painel.add(luz,BorderLayout.CENTER);
-			janela.add(painel);
+			janela.setContentPane(painel);
+			janela.setLocation(600, 400);
+			janela.setMinimumSize(janela.getSize());
 			janela.setVisible(true);
 
 			while(true) {

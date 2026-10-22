@@ -44,7 +44,7 @@ public class LightDecider {
 
 			// register with the server
 			Areas area=Areas.valueOf(args[2]);
-			out.writeObject(new RegistrationMessage(area, Type.SENSOR));
+			out.writeObject(new RegistrationMessage(area, Type.DECIDER));
 
 			int lightThreshold = Integer.parseInt(args[3]);
 

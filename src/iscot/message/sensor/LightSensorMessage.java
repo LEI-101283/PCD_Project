@@ -12,7 +12,7 @@ public class LightSensorMessage extends SensorMessage {
 
 	@Override
 	public String toString() {
-		return "LightSensorMessage [light=" + light + ", " + super.toString() + "]";
+		return "LightSensorMessage [light=" + light + ", area=" + area + ", getType()=" + getType() + "]";
 	}
-	
+
 }

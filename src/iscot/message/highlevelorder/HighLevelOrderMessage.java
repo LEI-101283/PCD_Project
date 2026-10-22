@@ -8,7 +8,6 @@ public abstract class HighLevelOrderMessage extends Message {
 
 	public HighLevelOrderMessage(Areas area) {
 		super(area);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

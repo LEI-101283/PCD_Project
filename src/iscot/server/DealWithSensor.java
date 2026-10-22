@@ -41,4 +41,11 @@ public class DealWithSensor extends DealWithClient{
 		
 	}
 
+
+	@Override
+	public String toString() {
+		return "DealWithSensor [getType()=" + getType() + ", getArea()=" + getArea() + ", getClientId()="
+				+ getClientId() + "]";
+	}
+
 }

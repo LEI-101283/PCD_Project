@@ -88,6 +88,7 @@ public class SystemMonitor {
 				Client client=(Client)obj;
 				adicionarCliente(client.getArea(), client.getClientId()+"-"+client.getType());
 			}
+			numMessagesLabel.setText(  server==null ||server.checkMessageQueue()==null?"0": server.checkMessageQueue().size()+"");
 			getPanel().invalidate();
 		}
 
@@ -106,12 +107,14 @@ public class SystemMonitor {
 			try {
 				while(true) {
 					Message message=server.getMessage(Type.SENSOR, getArea());
-					System.out.println("Sala got "+message);
+//					System.out.println("Sala got "+message);
 					if(message instanceof LightSensorMessage) {
 						System.err.println("Updating GUI to"+((LightSensorMessage)message));
 						sensorIluminacaoSala.setText(((LightSensorMessage)message).light+"");
 						sensorIluminacaoSala.invalidate();
 					}
+					else
+						System.err.println("Undealt message in Sala:"+message);
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -142,7 +145,8 @@ public class SystemMonitor {
 
 	// editable components
 	JTextField sensorIluminacaoSala;
-
+	JLabel numMessagesLabel;
+	
 	private JTextField sensorIluminacaoQuarto;
 	//	private int nextLogId = 0;
 	public SystemMonitor(Server server) throws IOException {
@@ -292,6 +296,12 @@ public class SystemMonitor {
 				BorderLayout.CENTER
 				);
 		debugPanel.setLocation(450,500);
+		
+		numMessagesLabel=new JLabel("0");
+		debugPanel.add(
+				numMessagesLabel,
+				BorderLayout.NORTH
+				);
 
 		return debugPanel;
 	}
