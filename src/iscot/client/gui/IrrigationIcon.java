@@ -3,7 +3,7 @@ package iscot.client.gui;
 import java.awt.*;
 import java.awt.geom.*;
 
-public class IconeRega extends EstadoComponente {
+public class IrrigationIcon extends ComponentState {
 	private int zona = 1;
 	private int duracao = 10;
 

@@ -6,17 +6,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import iscot.client.gui.IconeLuz;
 import iscot.client.gui.SensorControl;
 import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.RegistrationMessage;
 import iscot.message.sensor.LightSensorMessage;
-import iscot.message.sensor.TemperatureSensorMessage;
 
 public class LightSensor {
 
@@ -49,7 +45,7 @@ public class LightSensor {
 			// Criar os componentes gráficos
 			JPanel painel=new JPanel();
 			painel.setLayout(new BorderLayout());
-			SensorControl sensorControl= new SensorControl( "☀", "Luminosidade da sala", "lux",
+			SensorControl sensorControl= new SensorControl( "☀", "Luminosidade - "+area, "lux",
 				    0, 2000, 10, 320,
 				    valor -> {try {
 						out.writeObject(new LightSensorMessage(area, (float) valor));

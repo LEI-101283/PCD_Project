@@ -12,7 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import iscot.client.gui.IconeLuz;
+import iscot.client.gui.LightIcon;
 import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.Message;

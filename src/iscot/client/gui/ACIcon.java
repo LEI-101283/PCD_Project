@@ -3,7 +3,7 @@ package iscot.client.gui;
 import java.awt.*;
 import java.awt.geom.*;
 
-public class IconeAC extends EstadoComponente {
+public class ACIcon extends ComponentState {
 	private String modo = "Automático";
 	private double temperatura = 22.0;
 

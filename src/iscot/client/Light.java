@@ -12,7 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import iscot.client.gui.IconeLuz;
+import iscot.client.gui.LightIcon;
 import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.Message;
@@ -52,7 +52,7 @@ public class Light {
 			// Criar os componentes gráficos
 			JPanel painel=new JPanel();
 			painel.setLayout(new BorderLayout());
-			IconeLuz luz = new IconeLuz();
+			LightIcon luz = new LightIcon();
 			painel.add(luz,BorderLayout.CENTER);
 			janela.setContentPane(painel);
 			janela.setLocation(600, 400);

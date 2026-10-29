@@ -3,11 +3,11 @@ package iscot.client.gui;
 import java.awt.*;
 import javax.swing.*;
 
-public abstract class EstadoComponente extends JPanel {
+public abstract class ComponentState extends JPanel {
 
     private boolean ativo;
 
-    protected EstadoComponente() {
+    protected ComponentState() {
         setPreferredSize(new Dimension(100, 100));
         setOpaque(false);
     }

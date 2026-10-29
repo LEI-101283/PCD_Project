@@ -6,7 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
-public class IconeLuz extends EstadoComponente {
+public class LightIcon extends ComponentState {
 	private int intensidade = 100;
 
 	public void setLigada(boolean ligada) {

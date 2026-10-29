@@ -12,13 +12,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import iscot.client.gui.IconeLuz;
-import iscot.client.gui.IconeVentilador;
+import iscot.client.gui.LightIcon;
+import iscot.client.gui.VentilatorIcon;
 import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.message.Message;
 import iscot.message.RegistrationMessage;
 import iscot.message.highlevelorder.AreaLightingOrderMessage;
+import iscot.message.highlevelorder.AreaVentilationOrderMessage;
 import iscot.message.sensor.LightSensorMessage;
 
 public class Ventilator {
@@ -49,12 +50,13 @@ public class Ventilator {
 			JFrame janela = new JFrame("Ventilador em "+area);
 			janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+		
 			
 			// Criar os componentes gráficos
 			JPanel painel=new JPanel();
 			painel.setLayout(new BorderLayout());
-			IconeVentilador luz = new IconeVentilador();
-			painel.add(luz,BorderLayout.CENTER);
+			VentilatorIcon ventilator = new VentilatorIcon();
+			painel.add(ventilator,BorderLayout.CENTER);
 			janela.setContentPane(painel);
 			janela.setLocation(600, 400);
 			janela.setMinimumSize(janela.getSize());
@@ -63,18 +65,17 @@ public class Ventilator {
 
 			while(true) {
 				Message message=(Message) in.readObject();
-				// TODO deal with appropriate messages
-				if( message instanceof AreaLightingOrderMessage) {
-					AreaLightingOrderMessage areaLightingOrderMessage=(AreaLightingOrderMessage)message;
-					if(areaLightingOrderMessage.area == area) {
-						luz.setAtivo(areaLightingOrderMessage.state);
-						System.err.println("Altering light  at:"+area+" to;"+areaLightingOrderMessage.state);
+				if( message instanceof AreaVentilationOrderMessage) {
+					AreaVentilationOrderMessage areaVentilationOrderMessage=(AreaVentilationOrderMessage)message;
+					if(areaVentilationOrderMessage.area == area) {
+						ventilator.setAtivo(areaVentilationOrderMessage.state);
+						System.err.println("Altering Ventilator  at:"+area+" to;"+areaVentilationOrderMessage.state);
 					}
 					else
 						System.err.println("Message for unexpected area!");
 				}
 				else
-					System.err.println("Unexpected message in Light:"+message);
+					System.err.println("Unexpected message in Ventilator:"+message);
 
 			}
 		}

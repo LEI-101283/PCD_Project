@@ -3,7 +3,7 @@ package iscot.client.gui;
 import java.awt.*;
 import java.awt.geom.*;
 
-public class IconeVentilador extends EstadoComponente {
+public class VentilatorIcon extends ComponentState {
 	private int velocidade = 1;
 
 	public void setLigado(boolean ligado) {
