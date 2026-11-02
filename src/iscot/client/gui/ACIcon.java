@@ -3,24 +3,28 @@ package iscot.client.gui;
 import java.awt.*;
 import java.awt.geom.*;
 
-public class ACIcon extends ComponentState {
-	private String modo = "Automático";
-	private double temperatura = 22.0;
+import iscot.enums.AirConditioningMode;
 
-	public void setLigado(boolean ligado) {
-	    setAtivo(ligado);
-	}
+public class ACIcon extends ComponentState {
+	
+	
+	private AirConditioningMode mode = AirConditioningMode.Desligado;
+	private double temperature = -1;
 
 	public boolean isLigado() {
 	    return isAtivo();
 	}
-
-	public void setModo(String modo) {
-	    this.modo = modo;
+/** 
+ * 
+ * @param modo: valores 
+ */
+	public void setModo(AirConditioningMode mode) {
+	    this.mode = mode;
+	    setAtivo(mode!=AirConditioningMode.Desligado);
 	}
 
-	public String getModo() {
-	    return modo;
+	public AirConditioningMode getModo() {
+	    return mode;
 	}
 
 	public void setTemperatura(double temperatura) {
@@ -30,11 +34,11 @@ public class ACIcon extends ComponentState {
 	        );
 	    }
 
-	    this.temperatura = temperatura;
+	    this.temperature = temperatura;
 	}
 
 	public double getTemperatura() {
-	    return temperatura;
+	    return temperature;
 	}
 	
     @Override

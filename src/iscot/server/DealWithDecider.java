@@ -7,9 +7,9 @@ import java.util.List;
 
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
-import iscot.message.highlevelorder.HighLevelOrderMessage;
-import iscot.message.sensor.LightSensorMessage;
+import iscot.event.Event;
+import iscot.event.highlevelorder.HighLevelOrderEvent;
+import iscot.event.sensor.LightSensorEvent;
 
 public class DealWithDecider extends DealWithClient {
 
@@ -25,10 +25,10 @@ public class DealWithDecider extends DealWithClient {
 			@Override
 			public void run() {
 
-				HighLevelOrderMessage highLevelOrderMessage;
+				HighLevelOrderEvent highLevelOrderMessage;
 				while(true) {
 					try {
-						highLevelOrderMessage = (HighLevelOrderMessage)in.readObject();
+						highLevelOrderMessage = (HighLevelOrderEvent)in.readObject();
 						System.err.println("Got HighLevelOrderMessage:"+highLevelOrderMessage);
 						server.queueMessage(highLevelOrderMessage);
 					} catch (ClassNotFoundException e) {
@@ -45,7 +45,7 @@ public class DealWithDecider extends DealWithClient {
 		while(true)
 			try {
 				// TODO: deal with other deciders
-				Message message=server.getMessage(Type.SENSOR, getArea(),getClientId());
+				Event message=server.getMessage(Type.SENSOR, getArea(),getClientId());
 				System.err.println("Decider got: "+message);
 				out.writeObject(message);
 			} catch (InterruptedException | IOException e) {

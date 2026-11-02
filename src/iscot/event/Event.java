@@ -1,4 +1,4 @@
-package iscot.message;
+package iscot.event;
 
 import java.awt.geom.Area;
 import java.io.Serializable;
@@ -6,7 +6,7 @@ import java.io.Serializable;
 import iscot.enums.Areas;
 import iscot.enums.Type;
 
-public abstract class Message implements Serializable {
+public abstract class Event implements Serializable {
 	@Override
 	public String toString() {
 		return "Message [area=" + area + " type:"+ getType()+"]";
@@ -16,7 +16,7 @@ public abstract class Message implements Serializable {
 	
 	public abstract Type getType();
 
-	public Message(Areas area) {
+	public Event(Areas area) {
 		this.area = area;
 	}
 }

@@ -1,8 +1,8 @@
-package iscot.message.highlevelorder;
+package iscot.event.highlevelorder;
 
 import iscot.enums.Areas;
 
-public class AreaLightingOrderMessage extends HighLevelOrderMessage {
+public class AreaLightingOrderEvent extends HighLevelOrderEvent {
 	@Override
 	public String toString() {
 		return "AreaLightingOrderMessage [state=" + state + ", area=" + area + ", getType()=" + getType() + "]";
@@ -10,7 +10,7 @@ public class AreaLightingOrderMessage extends HighLevelOrderMessage {
 
 	public final boolean state;
 
-	public AreaLightingOrderMessage(Areas area, boolean state) {
+	public AreaLightingOrderEvent(Areas area, boolean state) {
 		super(area);
 		this.state = state;
 	}

@@ -15,8 +15,8 @@ import iscot.area.Area;
 import iscot.broker.Broker;
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
-import iscot.message.sensor.LightSensorMessage;
+import iscot.event.Event;
+import iscot.event.sensor.LightSensorEvent;
 import iscot.monitor.SystemMonitor;
 
 @SuppressWarnings("deprecation")
@@ -91,7 +91,7 @@ public class Server extends Observable{
 		return false;
 	}
 
-	public void queueMessage(Message message) {
+	public void queueMessage(Event message) {
 		broker.queueMessage(message);
 
 		// Debug
@@ -100,10 +100,10 @@ public class Server extends Observable{
 
 	}
 
-	public Message getMessage(Type type, Areas areas2, int clientNumber) throws InterruptedException {
+	public Event getMessage(Type type, Areas areas2, int clientNumber) throws InterruptedException {
 		return 	broker.getMessage(type, areas2,clientNumber); // single message in requested area
 	}
-	public List<Message> checkMessageQueue(){
+	public List<Event> checkMessageQueue(){
 		return broker.checkMessageQueue();
 	}
 	public int countClientsFor(Type type, Areas area) {
@@ -116,7 +116,7 @@ public class Server extends Observable{
 		return count;
 	}
 
-	public void notifyDeletedMessage(Message message) {
+	public void notifyDeletedMessage(Event message) {
 		// Debug
 		setChanged();
 		notifyObservers(message);		

@@ -16,11 +16,11 @@ import iscot.client.gui.LightIcon;
 import iscot.client.gui.VentilatorIcon;
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
-import iscot.message.RegistrationMessage;
-import iscot.message.highlevelorder.AreaLightingOrderMessage;
-import iscot.message.highlevelorder.AreaVentilationOrderMessage;
-import iscot.message.sensor.LightSensorMessage;
+import iscot.event.Event;
+import iscot.event.RegistrationEvent;
+import iscot.event.highlevelorder.AreaLightingOrderEvent;
+import iscot.event.highlevelorder.AreaVentilationOrderEvent;
+import iscot.event.sensor.LightSensorEvent;
 
 public class Ventilator {
 
@@ -45,7 +45,7 @@ public class Ventilator {
 
 			// register with the server
 			Areas area=Areas.valueOf(args[2]);
-			out.writeObject(new RegistrationMessage(area, Type.ACTUATOR));
+			out.writeObject(new RegistrationEvent(area, Type.ACTUATOR));
 
 			JFrame janela = new JFrame("Ventilador em "+area);
 			janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -64,9 +64,9 @@ public class Ventilator {
 			janela.setVisible(true);
 
 			while(true) {
-				Message message=(Message) in.readObject();
-				if( message instanceof AreaVentilationOrderMessage) {
-					AreaVentilationOrderMessage areaVentilationOrderMessage=(AreaVentilationOrderMessage)message;
+				Event message=(Event) in.readObject();
+				if( message instanceof AreaVentilationOrderEvent) {
+					AreaVentilationOrderEvent areaVentilationOrderMessage=(AreaVentilationOrderEvent)message;
 					if(areaVentilationOrderMessage.area == area) {
 						ventilator.setAtivo(areaVentilationOrderMessage.state);
 						System.err.println("Altering Ventilator  at:"+area+" to;"+areaVentilationOrderMessage.state);

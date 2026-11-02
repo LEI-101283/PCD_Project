@@ -1,12 +1,12 @@
-package iscot.message.highlevelorder;
+package iscot.event.highlevelorder;
 
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
+import iscot.event.Event;
 
-public abstract class HighLevelOrderMessage extends Message {
+public abstract class HighLevelOrderEvent extends Event {
 
-	public HighLevelOrderMessage(Areas area) {
+	public HighLevelOrderEvent(Areas area) {
 		super(area);
 	}
 

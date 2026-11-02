@@ -1,8 +1,8 @@
-package iscot.message.highlevelorder;
+package iscot.event.highlevelorder;
 
 import iscot.enums.Areas;
 
-public class AreaVentilationOrderMessage extends HighLevelOrderMessage{
+public class AreaVentilationOrderEvent extends HighLevelOrderEvent{
 	@Override
 	public String toString() {
 		return "AreaVentilationOrderMessage [state=" + state + ", area=" + area + ", getType()=" + getType() + "]";
@@ -10,7 +10,7 @@ public class AreaVentilationOrderMessage extends HighLevelOrderMessage{
 
 	public final boolean state;
 
-	public AreaVentilationOrderMessage(Areas area, boolean state) {
+	public AreaVentilationOrderEvent(Areas area, boolean state) {
 		super(area);
 		this.state = state;
 	}

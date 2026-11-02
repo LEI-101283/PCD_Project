@@ -15,14 +15,16 @@ import javax.swing.JPanel;
 import iscot.client.gui.LightIcon;
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
-import iscot.message.RegistrationMessage;
-import iscot.message.highlevelorder.AreaLightingOrderMessage;
-import iscot.message.highlevelorder.AreaVentilationOrderMessage;
-import iscot.message.sensor.HumiditySensorMessage;
-import iscot.message.sensor.LightSensorMessage;
+import iscot.event.Event;
+import iscot.event.RegistrationEvent;
+import iscot.event.highlevelorder.AreaIrrigationOrderEvent;
+import iscot.event.highlevelorder.AreaLightingOrderEvent;
+import iscot.event.highlevelorder.AreaVentilationOrderEvent;
+import iscot.event.sensor.GroundMoistureSensorEvent;
+import iscot.event.sensor.HumiditySensorEvent;
+import iscot.event.sensor.LightSensorEvent;
 
-public class HumidityDecider {
+public class HumidityDeciderWC {
 
 	/**
 	 * 
@@ -46,22 +48,22 @@ public class HumidityDecider {
 
 			// register with the server
 			Areas area=Areas.valueOf(args[2]);
-			out.writeObject(new RegistrationMessage(area, Type.DECIDER));
+			out.writeObject(new RegistrationEvent(area, Type.DECIDER));
 
 			int humidityThreshold = Integer.parseInt(args[3]);
 
 			while(true) {
-				Message message=(Message) in.readObject();
-				if( message instanceof HumiditySensorMessage) {
-					HumiditySensorMessage humiditySensorMessage=(HumiditySensorMessage)message;
-					if(humiditySensorMessage.area == area)
-						if(humiditySensorMessage.humidity>humidityThreshold) {
-							out.writeObject(new AreaVentilationOrderMessage(area, true));
-							System.err.println("Ordering light on at:"+area);
+				Event message=(Event) in.readObject();
+				if( message instanceof HumiditySensorEvent) {
+					HumiditySensorEvent humiditySensor=(HumiditySensorEvent)message;
+					if(humiditySensor.area == area)
+						if(humiditySensor.humidity>humidityThreshold) {
+							out.writeObject(new AreaVentilationOrderEvent(area, true));
+							System.err.println("Ordering Ventilation on at:"+area);
 						}
 						else {
-							out.writeObject(new AreaVentilationOrderMessage(area, false));
-							System.err.println("Ordering light off at:"+area);
+							out.writeObject(new AreaVentilationOrderEvent(area, false));
+							System.err.println("Ordering Ventilation off at:"+area);
 						}
 					else
 						System.err.println("Message for unexpected area!");

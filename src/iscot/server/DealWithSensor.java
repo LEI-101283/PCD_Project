@@ -7,10 +7,11 @@ import java.net.Socket;
 
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
-import iscot.message.RegistrationMessage;
-import iscot.message.sensor.HumiditySensorMessage;
-import iscot.message.sensor.LightSensorMessage;
+import iscot.event.Event;
+import iscot.event.RegistrationEvent;
+import iscot.event.sensor.GroundMoistureSensorEvent;
+import iscot.event.sensor.HumiditySensorEvent;
+import iscot.event.sensor.LightSensorEvent;
 
 public class DealWithSensor extends DealWithClient{
 
@@ -29,15 +30,20 @@ public class DealWithSensor extends DealWithClient{
 	public void run() {
 		while(true) {
 			try {
-				Message message=(Message) in.readObject();
-				if(message instanceof LightSensorMessage) {
-					LightSensorMessage lightSensorMessage=(LightSensorMessage)message;
+				Event message=(Event) in.readObject();
+				if(message instanceof LightSensorEvent) {
+					LightSensorEvent lightSensorMessage=(LightSensorEvent)message;
 					System.err.println("Got lighting message:"+lightSensorMessage);
 					server.queueMessage(lightSensorMessage);
 				}
-				else if(message instanceof HumiditySensorMessage) {
-					HumiditySensorMessage humiditySensorMessage=(HumiditySensorMessage)message;
+				else if(message instanceof HumiditySensorEvent) {
+					HumiditySensorEvent humiditySensorMessage=(HumiditySensorEvent)message;
 					System.err.println("Got HumiditySensorMessage message:"+humiditySensorMessage);
+					server.queueMessage(humiditySensorMessage);
+				}
+				else if(message instanceof GroundMoistureSensorEvent) {
+					GroundMoistureSensorEvent humiditySensorMessage=(GroundMoistureSensorEvent)message;
+					System.err.println("Got GroundHumiditySensorMessage message:"+humiditySensorMessage);
 					server.queueMessage(humiditySensorMessage);
 				}
 				else

@@ -1,11 +1,11 @@
-package iscot.message.sensor;
+package iscot.event.sensor;
 
 import iscot.enums.Areas;
 
-public class LightSensorMessage extends SensorMessage {
+public class LightSensorEvent extends SensorEvent {
 	public final float light; // always in lux
 
-	public LightSensorMessage(Areas area, float light) {
+	public LightSensorEvent(Areas area, float light) {
 		super(area);
 		this.light = light;
 	}

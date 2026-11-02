@@ -7,8 +7,8 @@ import java.util.List;
 
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
-import iscot.message.sensor.LightSensorMessage;
+import iscot.event.Event;
+import iscot.event.sensor.LightSensorEvent;
 
 public class DealWithActuator extends DealWithClient {
 
@@ -21,7 +21,7 @@ public class DealWithActuator extends DealWithClient {
 		while(true)
 			try {
 				// TODO: deal with other deciders
-				Message message=server.getMessage(Type.DECIDER, getArea(),getClientId());
+				Event message=server.getMessage(Type.DECIDER, getArea(),getClientId());
 				System.err.println(this+" got: "+message);
 				out.writeObject(message);
 			} catch (InterruptedException | IOException e) {

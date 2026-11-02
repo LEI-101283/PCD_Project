@@ -12,21 +12,21 @@ import java.util.concurrent.Semaphore;
 import iscot.area.Area;
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
+import iscot.event.Event;
 import iscot.server.Server;
 
 public class Broker{
-	private Map<Type,List<Message>> messages =new HashMap<Type, List<Message>>();
-	private Map<Message,CountDownLatch> cdls=new HashMap<Message,CountDownLatch>();
-	private Map<Message,List<Integer>> clientsAlreadyServed=new HashMap<Message,List<Integer>>();
+	private Map<Type,List<Event>> messages =new HashMap<Type, List<Event>>();
+	private Map<Event,CountDownLatch> cdls=new HashMap<Event,CountDownLatch>();
+	private Map<Event,List<Integer>> clientsAlreadyServed=new HashMap<Event,List<Integer>>();
 	private Server server;
 	public Broker(Server server) {
 		this.server = server;
 		for(Type type:Type.values())
-			messages.put(type, new ArrayList<Message>());
+			messages.put(type, new ArrayList<Event>());
 	}
 
-	public synchronized void queueMessage(Message message) {
+	public synchronized void queueMessage(Event message) {
 		messages.get(message.getType()).add(message);
 		CountDownLatch cdl=new CountDownLatch(server.countClientsFor(message.getType(), message.area));
 		List<Integer> clientList=new ArrayList<>();
@@ -51,7 +51,7 @@ public class Broker{
 //		System.err.println("Broker: message queued!");
 	}
 	
-	protected synchronized void removeMessage(Message message) {
+	protected synchronized void removeMessage(Event message) {
 		messages.get(message.getType()).remove(message);
 		cdls.remove(message);
 		clientsAlreadyServed.remove(message);
@@ -60,7 +60,7 @@ public class Broker{
 		notifyAll();
 	}
 
-	public synchronized Message getMessage(Type type, Areas area,int clientNumber) throws InterruptedException {
+	public synchronized Event getMessage(Type type, Areas area,int clientNumber) throws InterruptedException {
 		while(messages.isEmpty() || noMessageFor(type,area) || clientsAlreadyServed.get(messages.get(type).get(0)).contains(clientNumber)) {
 //			System.err.println(" Wait in getMessage!:"+messages+ "Asked for:"+type+area);
 			wait();
@@ -77,9 +77,9 @@ public class Broker{
 	}
 
 	// Just returns the queue, without any consequence in queue state, no remocals
-	public List<Message> checkMessageQueue() {
-		List<Message> returnedMessages=new ArrayList<>();
-		Collection<List<Message>> allLists=messages.values();
+	public List<Event> checkMessageQueue() {
+		List<Event> returnedMessages=new ArrayList<>();
+		Collection<List<Event>> allLists=messages.values();
 //		for(List<Message> list:allLists)
 		returnedMessages.addAll(returnedMessages);
 		return returnedMessages;

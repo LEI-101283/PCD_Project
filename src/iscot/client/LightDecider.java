@@ -15,10 +15,10 @@ import javax.swing.JPanel;
 import iscot.client.gui.LightIcon;
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
-import iscot.message.RegistrationMessage;
-import iscot.message.highlevelorder.AreaLightingOrderMessage;
-import iscot.message.sensor.LightSensorMessage;
+import iscot.event.Event;
+import iscot.event.RegistrationEvent;
+import iscot.event.highlevelorder.AreaLightingOrderEvent;
+import iscot.event.sensor.LightSensorEvent;
 
 public class LightDecider {
 
@@ -44,21 +44,21 @@ public class LightDecider {
 
 			// register with the server
 			Areas area=Areas.valueOf(args[2]);
-			out.writeObject(new RegistrationMessage(area, Type.DECIDER));
+			out.writeObject(new RegistrationEvent(area, Type.DECIDER));
 
 			int lightThreshold = Integer.parseInt(args[3]);
 
 			while(true) {
-				Message message=(Message) in.readObject();
-				if( message instanceof LightSensorMessage) {
-					LightSensorMessage lightSensorMessage=(LightSensorMessage)message;
+				Event message=(Event) in.readObject();
+				if( message instanceof LightSensorEvent) {
+					LightSensorEvent lightSensorMessage=(LightSensorEvent)message;
 					if(lightSensorMessage.area == area)
 						if(lightSensorMessage.light<lightThreshold) {
-							out.writeObject(new AreaLightingOrderMessage(area, true));
+							out.writeObject(new AreaLightingOrderEvent(area, true));
 							System.err.println("Ordering light on at:"+area);
 						}
 						else {
-							out.writeObject(new AreaLightingOrderMessage(area, false));
+							out.writeObject(new AreaLightingOrderEvent(area, false));
 							System.err.println("Ordering light off at:"+area);
 						}
 					else

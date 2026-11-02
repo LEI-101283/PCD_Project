@@ -1,11 +1,11 @@
-package iscot.message;
+package iscot.event;
 
 import iscot.enums.Areas;
 import iscot.enums.Type;
 
-public class RegistrationMessage extends Message {
+public class RegistrationEvent extends Event {
 	public final Type type;
-	public RegistrationMessage(Areas area, Type type) {
+	public RegistrationEvent(Areas area, Type type) {
 		super(area);
 		this.type = type;
 	}

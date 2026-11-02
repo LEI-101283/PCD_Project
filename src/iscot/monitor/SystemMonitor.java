@@ -11,10 +11,10 @@ import java.util.Observable;
 import java.util.Observer;
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
-import iscot.message.RegistrationMessage;
-import iscot.message.sensor.LightSensorMessage;
-import iscot.message.sensor.TemperatureSensorMessage;
+import iscot.event.Event;
+import iscot.event.RegistrationEvent;
+import iscot.event.sensor.LightSensorEvent;
+import iscot.event.sensor.TemperatureSensorEvent;
 import iscot.monitor.SystemMonitor.MonitorThread;
 import iscot.server.Client;
 import iscot.server.DealWithClient;
@@ -63,11 +63,11 @@ public class SystemMonitor implements Observer {
 		public void run() {
 			try {
 				while(true) {
-					Message message=server.getMessage(Type.SENSOR, getArea(),getClientId());
+					Event message=server.getMessage(Type.SENSOR, getArea(),getClientId());
 					//					System.out.println("Sala got "+message);
-					if(message instanceof LightSensorMessage) {
-						System.err.println("Updating GUI to"+((LightSensorMessage)message));
-						sensorIluminacaoSala.setText(((LightSensorMessage)message).light+"");
+					if(message instanceof LightSensorEvent) {
+						System.err.println("Updating GUI to"+((LightSensorEvent)message));
+						sensorIluminacaoSala.setText(((LightSensorEvent)message).light+"");
 						sensorIluminacaoSala.invalidate();
 					}
 					else
@@ -92,8 +92,8 @@ public class SystemMonitor implements Observer {
 	public void update(Observable arg0, Object arg1) {
 
 		Object obj=arg1;
-		if(obj instanceof Message) {
-			Message message=(Message)obj;
+		if(obj instanceof Event) {
+			Event message=(Event)obj;
 			if(logMessageExists(message)) {
 				removeLogMessage(message.toString());
 				log("Deleted:"+message.toString());
@@ -285,7 +285,7 @@ public class SystemMonitor implements Observer {
 		});
 	}
 
-	public boolean logMessageExists(Message message) {
+	public boolean logMessageExists(Event message) {
 		return debugListModel.contains(message.toString());
 	}
 	public void removeLogMessage(String mensagem) {

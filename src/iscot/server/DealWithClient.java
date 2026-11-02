@@ -7,7 +7,7 @@ import java.net.Socket;
 
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.RegistrationMessage;
+import iscot.event.RegistrationEvent;
 
 public class DealWithClient extends Client{
 	public DealWithClient(Server server, Areas area, ObjectInputStream in, ObjectOutputStream out) {
@@ -24,7 +24,7 @@ public class DealWithClient extends Client{
 	public void run() {
 		// get registration
 		try {
-			RegistrationMessage registrationMessage=(RegistrationMessage)in.readObject();
+			RegistrationEvent registrationMessage=(RegistrationEvent)in.readObject();
 			
 			switch (registrationMessage.type) {
 			case SENSOR:

@@ -15,10 +15,10 @@ import javax.swing.JPanel;
 import iscot.client.gui.LightIcon;
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.Message;
-import iscot.message.RegistrationMessage;
-import iscot.message.highlevelorder.AreaLightingOrderMessage;
-import iscot.message.sensor.LightSensorMessage;
+import iscot.event.Event;
+import iscot.event.RegistrationEvent;
+import iscot.event.highlevelorder.AreaLightingOrderEvent;
+import iscot.event.sensor.LightSensorEvent;
 
 public class Light {
 
@@ -43,7 +43,7 @@ public class Light {
 
 			// register with the server
 			Areas area=Areas.valueOf(args[2]);
-			out.writeObject(new RegistrationMessage(area, Type.ACTUATOR));
+			out.writeObject(new RegistrationEvent(area, Type.ACTUATOR));
 
 			JFrame janela = new JFrame("Luz em "+area);
 			janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -61,9 +61,9 @@ public class Light {
 			janela.setVisible(true);
 
 			while(true) {
-				Message message=(Message) in.readObject();
-				if( message instanceof AreaLightingOrderMessage) {
-					AreaLightingOrderMessage areaLightingOrderMessage=(AreaLightingOrderMessage)message;
+				Event message=(Event) in.readObject();
+				if( message instanceof AreaLightingOrderEvent) {
+					AreaLightingOrderEvent areaLightingOrderMessage=(AreaLightingOrderEvent)message;
 					if(areaLightingOrderMessage.area == area) {
 						luz.setAtivo(areaLightingOrderMessage.state);
 						System.err.println("Altering light  at:"+area+" to;"+areaLightingOrderMessage.state);

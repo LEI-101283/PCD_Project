@@ -14,9 +14,9 @@ import iscot.client.gui.LightIcon;
 import iscot.client.gui.SensorControl;
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.RegistrationMessage;
-import iscot.message.sensor.LightSensorMessage;
-import iscot.message.sensor.TemperatureSensorMessage;
+import iscot.event.RegistrationEvent;
+import iscot.event.sensor.LightSensorEvent;
+import iscot.event.sensor.TemperatureSensorEvent;
 
 public class TemperatureSensor {
 
@@ -40,7 +40,7 @@ public class TemperatureSensor {
 
 			// register with the server
 			Areas area=Areas.valueOf(args[2]);
-			out.writeObject(new RegistrationMessage(area, Type.SENSOR));
+			out.writeObject(new RegistrationEvent(area, Type.SENSOR));
 
 			JFrame janela = new JFrame("Temperatura em "+area);
 			janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -50,11 +50,15 @@ public class TemperatureSensor {
 			JPanel painel=new JPanel();
 			painel.setLayout(new BorderLayout());
 			SensorControl sensorControl= new SensorControl(
-				    "🌡", "Temperatura da sala", "°C",
+				    "🌡", "Temperatura - "+area, "°C",
 				    -10, 50, 0.5, 22.5,
 				    valor -> {
-				        // TODO enviar mensagem
-				        System.out.println("Nova temperatura: " + valor);
+				        try {
+							out.writeObject(new TemperatureSensorEvent(area,(float) valor));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 				    }
 				);
 			painel.add(sensorControl,BorderLayout.CENTER);
@@ -66,7 +70,7 @@ public class TemperatureSensor {
 			
 			// TODO
 			// Send message with initial value
-			out.writeObject(new LightSensorMessage(area, (float)sensorControl.getValor()));
+			out.writeObject(new TemperatureSensorEvent(area, (float)sensorControl.getValor()));
 		}
 	}
 

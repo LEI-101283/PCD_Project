@@ -1,11 +1,11 @@
-package iscot.message.sensor;
+package iscot.event.sensor;
 
 import iscot.enums.Areas;
 
-public class HumiditySensorMessage extends SensorMessage{
+public class HumiditySensorEvent extends SensorEvent{
 	public final float humidity; // always in %
 
-	public HumiditySensorMessage(Areas area, float humidity) {
+	public HumiditySensorEvent(Areas area, float humidity) {
 		super(area);
 		this.humidity = humidity;
 	}

@@ -11,8 +11,8 @@ import javax.swing.JPanel;
 import iscot.client.gui.SensorControl;
 import iscot.enums.Areas;
 import iscot.enums.Type;
-import iscot.message.RegistrationMessage;
-import iscot.message.sensor.LightSensorMessage;
+import iscot.event.RegistrationEvent;
+import iscot.event.sensor.LightSensorEvent;
 
 public class LightSensor {
 
@@ -36,7 +36,7 @@ public class LightSensor {
 
 			// register with the server
 			Areas area=Areas.valueOf(args[2]);
-			out.writeObject(new RegistrationMessage(area, Type.SENSOR));
+			out.writeObject(new RegistrationEvent(area, Type.SENSOR));
 
 			JFrame janela = new JFrame("Luz em "+area);
 			janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -48,7 +48,7 @@ public class LightSensor {
 			SensorControl sensorControl= new SensorControl( "☀", "Luminosidade - "+area, "lux",
 				    0, 2000, 10, 320,
 				    valor -> {try {
-						out.writeObject(new LightSensorMessage(area, (float) valor));
+						out.writeObject(new LightSensorEvent(area, (float) valor));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -61,7 +61,7 @@ public class LightSensor {
 			janela.setVisible(true);
 			
 			// Send message with initial value
-			out.writeObject(new LightSensorMessage(area, (float)sensorControl.getValor()));
+			out.writeObject(new LightSensorEvent(area, (float)sensorControl.getValor()));
 		}
 	}
 
