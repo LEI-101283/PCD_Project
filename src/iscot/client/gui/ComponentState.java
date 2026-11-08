@@ -17,10 +17,16 @@ public abstract class ComponentState extends JPanel {
     }
 
     public final void setAtivo(boolean ativo) {
-        SwingUtilities.invokeLater(() -> {
+    	Runnable tarefa = () -> {
             this.ativo = ativo;
             repaint();
-        });
+        };
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            tarefa.run();
+        } else {
+            SwingUtilities.invokeLater(tarefa);
+        }
     }
 
     protected final Color corEstado() {

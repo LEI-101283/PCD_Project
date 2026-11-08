@@ -1,3 +1,4 @@
+
 package iscot.server;
 
 import java.io.IOException;
@@ -5,121 +6,83 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Observable;
 
-import iscot.area.Area;
-import iscot.broker.Broker;
-import iscot.enums.Areas;
-import iscot.enums.Type;
-import iscot.event.Event;
-import iscot.event.sensor.LightSensorEvent;
-import iscot.monitor.SystemMonitor;
+import iscot.events.Event;
+import iscot.events.RegistrationEvent;
 
-@SuppressWarnings("deprecation")
-public class Server extends Observable{
-	private Broker broker= new Broker(this);
-	private ServerSocket serverSocket;
-	private Map<Areas,Area> areas= new HashMap<>();
+public class Server {
 
-	public Server(int portNumber, List<Area> areas) throws IOException {
-		serverSocket= new ServerSocket(portNumber);
-		for(Area area:areas)
-			this.areas.put(area.name, area);
-	}
+	private static final int PORT = 55000;
 
-	/* Server that manages the broker.
-	 * @params
-	 *  - int portNumber: for connection requests
-	 */
-	public static void main(String[] args) throws IOException {
-		if(args.length !=1) {
-			System.err.println("Invalid arguments!");
-		}
-		else {
-			int portNumber= Integer.parseInt(args[0]);
-			List<Area> areas=new ArrayList<Area>(Areas.values().length);
-			for(int i=1; i!=Areas.values().length;i++)
-				areas.add(new Area(Areas.values()[i]));
-			System.err.println("Existing areas:"+areas.size());
-			Server server= new Server(portNumber,areas);
-			new SystemMonitor(server);
-			server.startServing();	
+    public static void main(String[] args) {
 
-		}
-	}
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
 
-	private void startServing() {
-		while(true)
-			try {
-				Socket socket=serverSocket.accept();
-				new DealWithClient(this, null,new ObjectInputStream(socket.getInputStream()),new ObjectOutputStream(socket.getOutputStream()) ).start();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.err.println("Connection failed!");
-				e.printStackTrace();
-			}
-	}
+            System.out.println("Servidor iniciado na porta " + PORT);
+            System.out.println("À espera de clientes...");
 
-	public void register(Client client) {
-		if(!areaExists(client.getArea()) )
-			throw new IllegalArgumentException("Invalid Area:"+client.getArea());
-		if(isAlreadyRegistered(client))
-			throw new IllegalArgumentException("Sensor already registered!");
+            while (true) {
 
-		areas.get(client.getArea()).getClients().add(client);
+                Socket clientSocket = serverSocket.accept();
 
-		// Debug
-		setChanged();
-		notifyObservers(client);
+                System.out.println(
+                    "Novo cliente ligado: " +
+                    clientSocket.getInetAddress()
+                );
 
-	}
+                try {
 
-	private boolean areaExists(Areas areas2) {
-		return areas.containsKey(areas2);
-	}
+                    ObjectOutputStream output =
+                        new ObjectOutputStream(clientSocket.getOutputStream());
 
-	private boolean isAlreadyRegistered(Client client2) {
-		if(areas.get(client2.getArea())==null || areas.get(client2.getArea()).getClients().isEmpty())
-			return false;
-		for(Client client:areas.get(client2.getArea()).getClients())
-			if(client.getClientId()==client2.getClientId())
-				return true;
-		return false;
-	}
+                    output.flush();
 
-	public void queueMessage(Event message) {
-		broker.queueMessage(message);
+                    ObjectInputStream input =
+                        new ObjectInputStream(clientSocket.getInputStream());
 
-		// Debug
-		setChanged();
-		notifyObservers(message);
+                    Event evento = (Event) input.readObject();
 
-	}
+                    if (evento instanceof RegistrationEvent) {
 
-	public Event getMessage(Type type, Areas areas2, int clientNumber) throws InterruptedException {
-		return 	broker.getMessage(type, areas2,clientNumber); // single message in requested area
-	}
-	public List<Event> checkMessageQueue(){
-		return broker.checkMessageQueue();
-	}
-	public int countClientsFor(Type type, Areas area) {
-		int count=0;
-		for(Client client:areas.get(area).getClients())
-			if(client.getType()==Type.DECIDER && type==Type.SENSOR)
-				count++;
-			else if(client.getType()==Type.ACTUATOR && type==Type.DECIDER)
-				count++;
-		return count;
-	}
+                        RegistrationEvent registo =
+                            (RegistrationEvent) evento;
 
-	public void notifyDeletedMessage(Event message) {
-		// Debug
-		setChanged();
-		notifyObservers(message);		
-	}
+                        System.out.println(
+                            "Cliente registado: " +
+                            registo.getDeviceType() +
+                            " | Tipo: " + registo.getType() +
+                            " | Área: " + registo.getArea()
+                        );
 
+                        // Confirmar o registo
+                        output.writeObject(Boolean.TRUE);
+                        output.flush();
+
+                        System.out.println("Registo confirmado!");
+
+                    } else {
+
+                        output.writeObject(Boolean.FALSE);
+                        output.flush();
+
+                    }
+
+                } catch (IOException | ClassNotFoundException e) {
+
+                    System.err.println(
+                        "Erro ao comunicar com o cliente: " + e.getMessage()
+                    );
+
+                }
+
+            }
+
+        } catch (IOException e) {
+
+            System.err.println("Erro no servidor: " + e.getMessage());
+
+        }
+    }
 }
+
+

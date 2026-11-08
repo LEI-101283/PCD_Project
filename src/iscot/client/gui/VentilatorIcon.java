@@ -3,12 +3,35 @@ package iscot.client.gui;
 import java.awt.*;
 import java.awt.geom.*;
 
+import javax.swing.Timer;
+
 public class VentilatorIcon extends ComponentState {
 	private int velocidade = 1;
+	private double angulo = 0;
+	
+	private final Timer timer;
+	
+	public VentilatorIcon() {
+
+        timer = new Timer(30, e -> {
+            if (isAtivo()) {
+                angulo = (angulo + 8 * velocidade) % 360;
+                repaint();
+            }
+        });
+    }
 
 	public void setLigado(boolean ligado) {
-	    setAtivo(ligado);
-	}
+        setAtivo(ligado);
+
+        if (ligado) {
+            if (!timer.isRunning()) {
+                timer.start();
+            }
+        } else {
+            timer.stop();
+        }
+    }
 
 	public boolean isLigado() {
 	    return isAtivo();
@@ -26,6 +49,13 @@ public class VentilatorIcon extends ComponentState {
 
         int cx = getWidth() / 2;
         int cy = getHeight() / 2;
+        
+        // Rodar o conjunto das pás
+        g2.rotate(
+            Math.toRadians(angulo),
+            cx,
+            cy
+        );
 
         g2.setColor(corEstado());
 

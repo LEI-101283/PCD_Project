@@ -21,6 +21,8 @@ public class ACIcon extends ComponentState {
 	public void setModo(AirConditioningMode mode) {
 	    this.mode = mode;
 	    setAtivo(mode!=AirConditioningMode.Desligado);
+	    //Alteração feita
+	    repaint();
 	}
 
 	public AirConditioningMode getModo() {
