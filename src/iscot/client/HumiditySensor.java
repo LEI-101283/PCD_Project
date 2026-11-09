@@ -7,6 +7,7 @@ import iscot.client.gui.LightIcon;
 import iscot.client.gui.SensorControl;
 import iscot.enums.Areas;
 import iscot.enums.Type;
+import iscot.events.HumiditySensorEvent;
 
 public class HumiditySensor {
 
@@ -40,7 +41,11 @@ public class HumiditySensor {
 			SensorControl sensorControl= new SensorControl( "☀", "Humidade - "+area, "%",
 				    0, 100, 11, 50,
 				    valor -> {
-				    	// TODO handle change in sensor
+				    	// 1. Criar o evento correspondente à leitura deste sensor
+				        HumiditySensorEvent event = new HumiditySensorEvent(area, valor);
+				        
+				        // 2. Exibir o evento na consola (Fase 3 do enunciado)
+				        System.out.println("GERADO (Sensor Humidade): " + event.toString());
 				    });
 			painel.add(sensorControl,BorderLayout.CENTER);
 			janela.setContentPane(painel);

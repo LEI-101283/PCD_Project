@@ -21,4 +21,13 @@ public abstract class Event implements Serializable{
     public Areas getArea() { return area; }
     public LocalDateTime getTimestamp() { return timestamp; }
     
+    @Override
+    public String toString() {
+        return "Event{" +
+               "type=" + getType() +
+               ", area=" + getArea() +
+               ", timestamp=" + getTimestamp() +
+               '}';
+    }
+    
 }

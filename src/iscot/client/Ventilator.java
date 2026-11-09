@@ -299,8 +299,8 @@ public class Ventilator {
 
         boolean ligar = evento.getValue() > 75;
 
-        AreaVentilationOrderMessage ordem =
-            new AreaVentilationOrderMessage(area, ligar);
+        AreaVentilationOrderEvent ordem =
+            new AreaVentilationOrderEvent(area, ligar);
 
         if (estado.ventilador != ordem.isOn()) {
             estado.ventilador = ordem.isOn();
@@ -347,13 +347,13 @@ public class Ventilator {
             Areas area, AreaState estado, LightIcon luz,
             double valor, JTextArea historicoUI) {
 
-        LightSensorMessage evento =
-            new LightSensorMessage(area, valor);
+        LightSensorEvent evento =
+            new LightSensorEvent(area, valor);
 
         boolean ligar = evento.getValue() < 40;
 
-        AreaLightingOrderMessage ordem =
-            new AreaLightingOrderMessage(area, ligar);
+        AreaLightingOrderEvent ordem =
+            new AreaLightingOrderEvent(area, ligar);
 
         if (estado.luz != ordem.isOn()) {
             estado.luz = ordem.isOn();
