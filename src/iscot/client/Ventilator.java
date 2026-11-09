@@ -325,11 +325,9 @@ public class Ventilator {
 
 	    AirConditioningMode novoModo;
 
-	    if (temperatura < 18) {
+	    if (temperatura < 20) {
 	        novoModo = AirConditioningMode.Aquecimento;
-	    } else if (temperatura <= 22) {
-	        novoModo = AirConditioningMode.Ventilação;
-	    } else if (temperatura <= 26) {
+	    } else if (temperatura <= 30) {
 	        novoModo = AirConditioningMode.Desligado;
 	    } else {
 	        novoModo = AirConditioningMode.Frio;

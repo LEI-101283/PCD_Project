@@ -50,7 +50,7 @@ public class LightIcon extends ComponentState {
         g2.setColor(cor);
         g2.fillOval(cx - 22, cy - 27, 44, 44);
         g2.fillRoundRect(cx - 12, cy + 15, 24, 16, 4, 4);
-
+        
         if (isAtivo()) {
             g2.setStroke(new BasicStroke(3));
 
