@@ -49,7 +49,7 @@ public class Server {
 
                         System.out.println(
                             "Cliente registado: " +
-                            registo.getDeviceType() +
+                            //registo.getDeviceType() +
                             " | Tipo: " + registo.getType() +
                             " | Área: " + registo.getArea()
                         );

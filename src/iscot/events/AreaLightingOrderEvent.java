@@ -9,4 +9,14 @@ public class AreaLightingOrderEvent extends HighLevelOrderEvent {
         this.turnOnLights = turnOnLights;
     }
     public boolean isTurnOnLights() { return turnOnLights; }
+    
+    @Override
+    public String toString(){
+    	if(isTurnOnLights())
+    	{
+    		return ("Luz ligada em " + super.getArea());
+    	}
+    	
+    	return "Luz desligada em " + super.getArea();
+    }
 }

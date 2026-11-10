@@ -9,4 +9,14 @@ public class AreaIrrigationOrderEvent extends HighLevelOrderEvent {
         this.turnOnWater = turnOnWater;
     }
     public boolean isTurnOnWater() { return turnOnWater; }
+    
+    @Override
+    public String toString(){
+    	if(isTurnOnWater())
+    	{
+    		return ("Irrigação ligada em " + super.getArea());
+    	}
+    	
+    	return "Irrigação desligada em " + super.getArea();
+    }
 }
