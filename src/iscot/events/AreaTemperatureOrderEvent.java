@@ -3,10 +3,10 @@ package iscot.events;
 import iscot.enums.AirConditioningMode;
 import iscot.enums.Areas;
 
-public class AreaTemperatureOrderMessage extends HighLevelOrderMessage {
+public class AreaTemperatureOrderEvent extends HighLevelOrderEvent {
     private final AirConditioningMode mode;
 
-    public AreaTemperatureOrderMessage(Areas area, AirConditioningMode mode) {
+    public AreaTemperatureOrderEvent(Areas area, AirConditioningMode mode) {
         super(area);
         this.mode = mode;
     }
