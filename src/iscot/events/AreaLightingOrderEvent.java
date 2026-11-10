@@ -3,11 +3,10 @@ package iscot.events;
 import iscot.enums.Areas;
 
 public class AreaLightingOrderEvent extends HighLevelOrderEvent {
-    private final boolean on;
-
-    public AreaLightingOrderEvent(Areas area, boolean on) {
+    private final boolean turnOnLights;
+    public AreaLightingOrderEvent(Areas area, boolean turnOnLights) {
         super(area);
-        this.on = on;
+        this.turnOnLights = turnOnLights;
     }
-    public boolean isOn() { return on; }
+    public boolean isTurnOnLights() { return turnOnLights; }
 }

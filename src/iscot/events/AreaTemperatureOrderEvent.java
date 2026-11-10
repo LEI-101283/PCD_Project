@@ -4,12 +4,10 @@ import iscot.enums.AirConditioningMode;
 import iscot.enums.Areas;
 
 public class AreaTemperatureOrderEvent extends HighLevelOrderEvent {
-    private final AirConditioningMode mode;
-
-    public AreaTemperatureOrderEvent(Areas area, AirConditioningMode mode) {
+    private final double targetTemperature; // Em vez de boolean, podes enviar o alvo
+    public AreaTemperatureOrderEvent(Areas area, double targetTemperature) {
         super(area);
-        this.mode = mode;
+        this.targetTemperature = targetTemperature;
     }
-
-    public AirConditioningMode getMode() { return mode; }
+    public double getTargetTemperature() { return targetTemperature; }
 }
