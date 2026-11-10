@@ -2,11 +2,9 @@ package iscot.client;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -18,7 +16,11 @@ import iscot.enums.Areas;
 import iscot.enums.Type;
 import iscot.events.AreaVentilationOrderEvent;
 
-public class Ventilator {
+    private static final double HUM_INICIAL = 50;
+    private static final double TEMP_INICIAL = 24;
+    private static final double TEMP_WC_INICIAL = 26;
+    private static final double LUM_INICIAL = 70;
+    private static final double SOLO_INICIAL = 50;
 
 	/**
 	 * 
