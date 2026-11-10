@@ -68,6 +68,14 @@ public class SensorControl extends JPanel {
 		slider.setMajorTickSpacing(Math.max(1, numeroPassos / 4));
 		slider.setPaintTicks(true);
 		slider.setPaintLabels(true);
+		
+		java.util.Hashtable<Integer, JLabel> rotulos = new java.util.Hashtable<>();
+		String formato = passo < 1 ? "%.1f" : "%.0f";
+		for (int i = 0; i <= numeroPassos; i += slider.getMajorTickSpacing()) {
+		    rotulos.put(i, new JLabel(String.format(formato, minimo + i * passo)));
+		}
+		rotulos.put(numeroPassos, new JLabel(String.format(formato, maximo))); // marca do máximo
+		slider.setLabelTable(rotulos);
 
 		valorLabel = new JLabel("", SwingConstants.CENTER);
 		atualizarEtiqueta();

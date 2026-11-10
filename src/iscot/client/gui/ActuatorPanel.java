@@ -23,19 +23,24 @@ public class ActuatorPanel extends JPanel {
 	private final DefaultListModel<String> historico = new DefaultListModel<>();
 
 	public ActuatorPanel(JComponent icone) {
+		this(icone, 100);
+	}
+
+	/** Igual ao anterior, mas com altura do histórico à escolha (para janelas compactas). */
+	public ActuatorPanel(JComponent icone, int alturaHistorico) {
 		super(new BorderLayout(5, 5));
 
 		add(icone, BorderLayout.CENTER);
 
 		JScrollPane scroll = new JScrollPane(new JList<>(historico));
-		scroll.setPreferredSize(new Dimension(260, 100));
+		scroll.setPreferredSize(new Dimension(260, alturaHistorico));
 		scroll.setBorder(BorderFactory.createTitledBorder("Histórico de ações"));
 		add(scroll, BorderLayout.SOUTH);
 	}
 
 	/** Regista uma ação no histórico, com a hora (HH:MM:SS). Pode ser chamado de qualquer thread. */
 	public void registar(String acao) {
-		String linha = acao;
+		String linha = acao + " - " + LocalTime.now().format(FORMATO);
 		SwingUtilities.invokeLater(() -> historico.addElement(linha));
 	}
 }
