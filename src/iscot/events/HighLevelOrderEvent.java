@@ -4,6 +4,6 @@ import iscot.enums.Type;
 
 public abstract class HighLevelOrderEvent extends Event {
     protected HighLevelOrderEvent(Areas area) {
-        super(Type.DECIDER, area); // Força sempre o tópico DECIDER
+        super(Type.DECIDER, area);
     }
 }

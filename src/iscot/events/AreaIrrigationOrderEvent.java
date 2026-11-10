@@ -14,9 +14,9 @@ public class AreaIrrigationOrderEvent extends HighLevelOrderEvent {
     public String toString(){
     	if(isTurnOnWater())
     	{
-    		return ("Irrigação ligada em " + super.getArea());
+    		return ("Irrigação ligada em " + super.getArea() + " - " + super.getTimestamp());
     	}
     	
-    	return "Irrigação desligada em " + super.getArea();
+    	return "Irrigação desligada em " + super.getArea() + " - " + super.getTimestamp();
     }
 }

@@ -1,16 +1,6 @@
 package iscot.client;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import iscot.client.gui.ActuatorPanel;
 import iscot.client.gui.VentilatorIcon;
 import iscot.enums.Areas;
 import iscot.events.AreaVentilationOrderEvent;
@@ -18,75 +8,39 @@ import iscot.events.AreaVentilationOrderEvent;
 public class Ventilator {
 
 	/**
-	 * 
-	 * @param server    address and port
-	 * @param roomName: string
-	 * @throws IOException
-	 * @throws UnknownHostException
-	 * @throws NumberFormatException
-	 * @throws InterruptedException
-	 * @throws ClassNotFoundException
+	 * @param args IP PORT Area
 	 */
-	public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException,
-			InterruptedException, ClassNotFoundException {
-		if (args.length != 3) {
-			System.err.println("Invalid arguments!");
-		} else {
-			// TODO connect to server
-
-			// TODO register with the server
-
-			// TODO: for first phase: create an appropriate event hardcoded locally and
-			// change the GUI accordingly
-			
-			// TODO: receive and handle messages from server
-			
-			// TODO: for first phase: create an appropriate event hardcoded locally and
-			// change the GUI accordingly
-
-			Areas area = Areas.valueOf(args[2]);
-
-			JFrame janela = new JFrame("Ventilador em " + area);
-			janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-			// Criar os componentes gráficos
-			JPanel painel = new JPanel();
-			painel.setLayout(new BorderLayout());
-			VentilatorIcon ventilator = new VentilatorIcon();
-			painel.add(ventilator, BorderLayout.CENTER);
-			janela.setContentPane(painel);
-			janela.setLocation(600, 400);
-			janela.setMinimumSize(janela.getSize());
-			janela.pack();
-			janela.setVisible(true);
-
-			// 1. Vamos criar uma Thread temporária só para simular um atraso na rede
-			new Thread(() -> {
-				try {
-					System.out.println("À espera de uma ordem...");
-					Thread.sleep(3000); // Espera 3 segundos para veres a janela fechada primeiro
-
-					// 2. Criar o evento simulado ("hardcoded") da ordem do Decisor
-					AreaVentilationOrderEvent ordemLigar = new AreaVentilationOrderEvent(area, true);
-					System.out.println("Ordem recebida: " + ordemLigar);
-
-					// 3. Alterar a interface gráfica com base no evento
-					ventilator.setAtivo(ordemLigar.isOn());
-
-					// Vamos testar desligar passado uns segundos
-					Thread.sleep(3000);
-					AreaVentilationOrderEvent ordemDesligar = new AreaVentilationOrderEvent(area, false);
-					System.out.println("Ordem recebida: " + ordemDesligar);
-					ventilator.setAtivo(ordemDesligar.isOn());
-
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}).start();
-
-			
-
-			
+	public static void main(String[] args) {
+		Areas area = ClientWindow.parseArea(args);
+		if (area == null) {
+			return;
 		}
+
+		// TODO connect to server
+		// TODO register with the server
+		// TODO receive and handle events from server
+
+		VentilatorIcon ventilador = new VentilatorIcon();
+		ActuatorPanel painel = new ActuatorPanel(ventilador);
+		ClientWindow.show("Ventilador em " + area, painel);
+
+		// Fase 3: ordens simuladas localmente
+		new Thread(() -> {
+			try {
+				System.out.println("À espera de uma ordem...");
+				Thread.sleep(3000);
+				aplicar(new AreaVentilationOrderEvent(area, true), ventilador, painel);
+				Thread.sleep(5000);
+				aplicar(new AreaVentilationOrderEvent(area, false), ventilador, painel);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}).start();
+	}
+
+	private static void aplicar(AreaVentilationOrderEvent ordem, VentilatorIcon ventilador, ActuatorPanel painel) {
+		System.out.println("Ordem recebida: " + ordem);
+		ventilador.setLigado(ordem.isOn()); // setLigado arranca/pára a rotação das pás
+		painel.registar(ordem.toString());
 	}
 }

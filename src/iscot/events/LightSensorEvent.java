@@ -6,6 +6,6 @@ public class LightSensorEvent extends SensorEvent {
     public LightSensorEvent(Areas area, double value) { super(area, value); }
     @Override
     public String toString() {
-        return super.toString() + " -> Luz: " + getValue() + "ºC";
+        return super.toString() + " -> Luz: " + getValue() + "%";
     }
 }

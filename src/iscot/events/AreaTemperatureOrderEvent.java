@@ -4,24 +4,29 @@ import iscot.enums.AirConditioningMode;
 import iscot.enums.Areas;
 
 public class AreaTemperatureOrderEvent extends HighLevelOrderEvent {
-    private final double targetTemperature; // Em vez de boolean, podes enviar o valor
-    public AreaTemperatureOrderEvent(Areas area, double targetTemperature) {
+    private final AirConditioningMode mode;
+    private final double targetTemperature;
+
+    public AreaTemperatureOrderEvent(Areas area, AirConditioningMode mode, double targetTemperature) {
         super(area);
+        this.mode = mode;
         this.targetTemperature = targetTemperature;
     }
+
+    public AirConditioningMode getMode() { return mode; }
     public double getTargetTemperature() { return targetTemperature; }
-    
+
     @Override
-    public String toString(){
-    	if(targetTemperature > 25)
-    	{
-    		return ("Ar condicionado no frio ligado em " + super.getArea());
-    	}
-    	
-    	else if(targetTemperature < 20) {
-    		return ("Ar condicionado no quente ligado em " + super.getArea());
-    	}
-    	
-    	return "Ar condicionado desligado em " + super.getArea();
+    public String toString() {
+        switch (mode) {
+        case Frio:
+            return "Ar condicionado no frio ligado em " + getArea() + " - " + super.getTimestamp();
+        case Aquecimento:
+            return "Ar condicionado no quente ligado em " + getArea() + " - " + super.getTimestamp();
+        case Ventilação:
+            return "Ar condicionado em ventilação em " + getArea() + " - " + super.getTimestamp();
+        default:
+            return "Ar condicionado desligado em " + getArea() + " - " + super.getTimestamp();
+        }
     }
 }

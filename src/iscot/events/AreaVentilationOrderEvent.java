@@ -14,9 +14,9 @@ public class AreaVentilationOrderEvent extends HighLevelOrderEvent {
     public String toString(){
     	if(isOn())
     	{
-    		return ("Ventilador ligado em " + super.getArea());
+    		return ("Ventilador ligado em " + super.getArea() + " - " + super.getTimestamp());
     	}
     	
-    	return "Ventilador desligado em " + super.getArea();
+    	return "Ventilador desligado em " + super.getArea() + " - " + super.getTimestamp();
     }
 }

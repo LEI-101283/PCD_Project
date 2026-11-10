@@ -14,9 +14,9 @@ public class AreaLightingOrderEvent extends HighLevelOrderEvent {
     public String toString(){
     	if(isTurnOnLights())
     	{
-    		return ("Luz ligada em " + super.getArea());
+    		return ("Luz ligada em " + super.getArea()) + " - " + super.getTimestamp();
     	}
     	
-    	return "Luz desligada em " + super.getArea();
+    	return "Luz desligada em " + super.getArea() + " - " + super.getTimestamp();
     }
 }
